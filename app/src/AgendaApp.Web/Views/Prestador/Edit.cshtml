@@ -1,0 +1,690 @@
+@model AgendaApp.Web.ViewModels.PrestadorViewModel
+@{
+    ViewData["Title"] = "Editar Prestador";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-edit text-warning"></i>
+                        Editar Prestador
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" novalidate>
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">
+                                        <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Nome) *
+                                    </label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo">
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="CNPJ" class="form-label">
+                                        <i class="fas fa-id-card"></i> @Html.DisplayNameFor(m => m.CNPJ)
+                                    </label>
+                                    <input asp-for="CNPJ" class="form-control" placeholder="00.000.000/0000-00"
+                                        data-mask="00.000.000/0000-00">
+                                    <span asp-validation-for="CNPJ" class="text-danger"></span>
+                                    <div class="form-text">Opcional - Apenas se for pessoa jurídica</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="AreaAtuacao" class="form-label">
+                                <i class="fas fa-briefcase"></i> @Html.DisplayNameFor(m => m.AreaAtuacao) *
+                            </label>
+                            <input asp-for="AreaAtuacao" class="form-control"
+                                placeholder="Ex: Medicina, Psicologia, Estética, etc.">
+                            <span asp-validation-for="AreaAtuacao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope"></i> @Html.DisplayNameFor(m => m.Email) *
+                                    </label>
+                                    <input asp-for="Email" type="email" class="form-control"
+                                        placeholder="exemplo@email.com">
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Telefone" class="form-label">
+                                        <i class="fas fa-phone"></i> @Html.DisplayNameFor(m => m.Telefone) *
+                                    </label>
+                                    <input asp-for="Telefone" class="form-control" placeholder="(00) 90000-0000"
+                                        data-mask="(00) 00000-0000">
+                                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="Ativo" class="form-check-input">
+                                <label asp-for="Ativo" class="form-check-label">
+                                    Prestador ativo
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Seção de Serviços -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cogs me-2"></i>Serviços do Prestador (@(Model.Servicos?.Count ?? 0))
+                    </h6>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#selecionarServicoModal">
+                        <i class="fas fa-plus fa-sm "></i>Selecionar serviço
+                    </button>
+
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#adicionarServicoModal">
+                        <i class="fas fa-plus fa-sm "></i>Novo Serviço
+                    </button>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    @if (Model.Servicos != null && Model.Servicos.Any())
+                    {
+                        @foreach (var servico in Model.Servicos)
+                        {
+                            <div class="card border-left-primary mb-3">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="text-primary mb-1">@servico.Nome</h6>
+                                            <p class="text-muted small mb-2">@servico.Descricao</p>
+                                            <div class="d-flex gap-2">
+                                                <span class="badge bg-success">
+                                                    R$ @servico.Valor.ToString("F2")
+                                                </span>
+                                                <span class="badge bg-info">
+                                                    @{
+                                                        var horas = servico.DuracaoEmMinutos / 60;
+                                                        var minutos = servico.DuracaoEmMinutos % 60;
+                                                        var duracao = horas > 0 ? $"{horas}h {minutos.ToString("00")}min" :
+                                                        $"{minutos}min";
+                                                    }
+                                                    @duracao
+                                                </span>
+                                                @if (servico.Ativo)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check fa-sm"></i> Ativo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times fa-sm"></i> Inativo
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="Servico" asp-action="Edit"
+                                                        asp-route-id="@servico.Id">
+                                                        <i class="fas fa-edit me-2"></i>Editar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item text-danger btn-delete-ajax"
+                                                        data-delete-url="@Url.Action("DeleteAjax", "Servico", new { id = servico.Id })"
+                                                        data-item-name="o serviço '@servico.Nome'"
+                                                        data-confirm-message="Tem certeza que deseja excluir o serviço '@servico.Nome'?"
+                                                        data-item-details="<strong>Valor:</strong> R$ @servico.Valor.ToString("F2")<br><strong>Duração:</strong> @(servico.DuracaoEmMinutos / 60 > 0 ? $"{servico.DuracaoEmMinutos / 60}h {(servico.DuracaoEmMinutos % 60).ToString("00")}min" : $"{servico.DuracaoEmMinutos}min")<br><strong>Status:</strong> @(servico.Ativo ? "Ativo" : "Inativo")">
+                                                        <i class="fas fa-trash me-2"></i>Excluir
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Este prestador ainda não possui serviços cadastrados.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#adicionarServicoModal">
+                                <i class="fas fa-plus me-2"></i>Adicionar Primeiro Serviço
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Selecionar Serviço -->
+<div class="modal fade" id="selecionarServicoModal" tabindex="-1" aria-labelledby="selecionarServicoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="selecionarServicoModalLabel">
+                    <i class="fas fa-list me-2"></i>Selecionar Serviços Disponíveis
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="filtroServicos" 
+                                placeholder="Buscar serviços...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnRecarregarServicos">
+                            <i class="fas fa-sync-alt me-1"></i>Recarregar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loadingServicos" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Carregando serviços disponíveis...</p>
+                </div>
+
+                <div id="listaServicos" class="row g-3">
+                    <!-- Serviços serão carregados aqui via AJAX -->
+                </div>
+
+                <div id="semServicos" class="text-center py-4" style="display: none;">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Nenhum serviço disponível para vinculação.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Serviço -->
+<div class="modal fade" id="adicionarServicoModal" tabindex="-1" aria-labelledby="adicionarServicoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="adicionarServicoModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Adicionar Novo Serviço
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form id="formAdicionarServico" action="@Url.Action("AdicionarServico", "Prestador")" method="post">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="PrestadorId" value="@Model.Id" />
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="Nome" id="servicoNome"
+                                    placeholder="Nome do Serviço" required>
+                                <label for="servicoNome">Nome do Serviço</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="Valor" id="servicoValor"
+                                    placeholder="Valor" required pattern="^[0-9]+([,\.][0-9]{1,2})?$">
+                                <label for="servicoValor">Valor (R$)</label>
+                                <div class="invalid-feedback">Digite um valor válido (ex: 32,50)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" name="Descricao" id="servicoDescricao"
+                                    placeholder="Descrição" style="height: 100px"></textarea>
+                                <label for="servicoDescricao">Descrição</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" name="DuracaoEmMinutos" id="servicoDuracao"
+                                    min="1" placeholder="Duração" required>
+                                <label for="servicoDuracao">Duração (minutos)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="Ativo" id="servicoAtivo"
+                                    value="true" checked>
+                                <input type="hidden" name="Ativo" value="false">
+                                <label class="form-check-label" for="servicoAtivo">
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Serviço Ativo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Salvar Serviço
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Máscaras para campos
+            $('#CNPJ').mask('00.000.000/0000-00');
+            $('#Telefone').mask('(00) 00000-0000');
+        });
+
+
+
+        // Submissão do formulário de adicionar serviço via AJAX
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formAdicionarServico');
+            if (!form) {
+                console.error('Formulário formAdicionarServico não encontrado!');
+                return;
+            }
+
+            form.addEventListener('submit', function (e) {
+                console.log('=== SUBMIT INTERCEPTADO ===');
+                e.preventDefault();
+
+                // Validação básica antes do envio
+                const nome = document.getElementById('servicoNome').value.trim();
+                const valorInput = document.getElementById('servicoValor').value;
+                const valor = parseFloat(valorInput.replace(',', '.')); // Converte vírgula para ponto
+                const duracao = parseInt(document.getElementById('servicoDuracao').value);
+
+
+                if (!nome || nome.length < 2) {
+                    Swal.fire({
+                        title: 'Erro de Validação!',
+                        text: 'Nome do serviço deve ter pelo menos 2 caracteres.',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                if (!valor || valor < 0.01) {
+                    Swal.fire({
+                        title: 'Erro de Validação!',
+                        text: 'Valor deve ser maior que R$ 0,01.',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                if (!duracao || duracao < 1) {
+                    Swal.fire({
+                        title: 'Erro de Validação!',
+                        text: 'Duração deve ser de pelo menos 1 minuto.',
+                        icon: 'error'
+                    });
+                    return;
+                }
+
+                // Criar FormData (pt-BR usa vírgula como separador)
+                const formData = new FormData(this);
+
+                console.log('=== DEBUG FORMDATA ===');
+                for (let pair of formData.entries()) {
+                    console.log(`${pair[0]}: ${pair[1]}`);
+                }
+
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+
+                // Desabilitar botão e mostrar loading
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            bootstrap.Modal.getInstance(document.getElementById('adicionarServicoModal')).hide();
+
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Serviço adicionado com sucesso.',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            response.text().then(responseText => {
+                                console.log('Response text:', responseText);
+
+                                let errorData = {};
+                                try {
+                                    errorData = JSON.parse(responseText);
+                                } catch (jsonError) {
+                                    console.error('Erro ao fazer parse do JSON:', jsonError);
+                                }
+
+                                let errorMessage = 'Erro ao adicionar serviço.';
+
+                                if (errorData.message) {
+                                    errorMessage = errorData.message;
+                                }
+
+                                if (errorData.errors && Array.isArray(errorData.errors)) {
+                                    const validationErrors = errorData.errors.map(error => {
+                                        const fieldName = error.Field.replace('model.', '').replace('Model.', '');
+                                        const errorMessages = Array.isArray(error.Errors) ? error.Errors : [error.Errors];
+                                        return `• ${fieldName}: ${errorMessages.join(', ')}`;
+                                    }).join('\n');
+
+                                    errorMessage += '\n\nErros de validação:\n' + validationErrors;
+                                }
+
+                                Swal.fire({
+                                    title: 'Erro de Validação!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    width: '500px'
+                                });
+                            }).catch(textError => {
+                                console.error('Erro ao ler resposta como texto:', textError);
+                                Swal.fire({
+                                    title: 'Erro!',
+                                    text: `Erro ${response.status}: ${response.statusText}`,
+                                    icon: 'error'
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'Erro de conexão. Verifique sua internet e tente novamente.',
+                            icon: 'error'
+                        });
+                    })
+                    .finally(() => {
+                        // Restaurar botão
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+            });
+        });
+
+        // Limpar formulário quando modal for fechado
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('adicionarServicoModal');
+            if (modal) {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    const form = document.getElementById('formAdicionarServico');
+                    const servicoAtivo = document.getElementById('servicoAtivo');
+                    if (form) form.reset();
+                    if (servicoAtivo) servicoAtivo.checked = true;
+                });
+            }
+        });
+
+        // Formatação e validação do valor monetário (pt-BR)
+        document.getElementById('servicoValor').addEventListener('blur', function (e) {
+            let inputValue = e.target.value.trim();
+
+            // Remove espaços e caracteres inválidos (exceto números, vírgula e ponto)
+            inputValue = inputValue.replace(/[^\d,\.]/g, '');
+
+            // Aceita tanto vírgula quanto ponto como separador decimal
+            let value = parseFloat(inputValue.replace(',', '.'));
+
+            if (!isNaN(value) && value >= 0) {
+                // Formatar para pt-BR (vírgula como separador)
+                e.target.value = value.toFixed(2).replace('.', ',');
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            } else if (inputValue !== '') {
+                // Se há valor mas é inválido
+                e.target.classList.remove('is-valid');
+                e.target.classList.add('is-invalid');
+            } else {
+                // Campo vazio, remover classes de validação
+                e.target.classList.remove('is-valid', 'is-invalid');
+            }
+        });
+
+        // ===== FUNCIONALIDADE DO MODAL DE SELEÇÃO DE SERVIÇOS =====
+        
+        // Carregar serviços quando o modal for aberto
+        document.getElementById('selecionarServicoModal').addEventListener('show.bs.modal', function () {
+            carregarServicosDisponiveis();
+        });
+
+        // Função para carregar serviços disponíveis
+        function carregarServicosDisponiveis() {
+            const prestadorId = '@Model.Id';
+            const loadingDiv = document.getElementById('loadingServicos');
+            const listaDiv = document.getElementById('listaServicos');
+            const semServicosDiv = document.getElementById('semServicos');
+
+            // Mostrar loading
+            loadingDiv.style.display = 'block';
+            listaDiv.style.display = 'none';
+            semServicosDiv.style.display = 'none';
+
+            fetch(`@Url.Action("ObterServicosGlobaisDisponiveis", "Prestador")?prestadorId=${prestadorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingDiv.style.display = 'none';
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        renderizarServicos(data.data);
+                        listaDiv.style.display = 'block';
+                    } else {
+                        semServicosDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar serviços:', error);
+                    loadingDiv.style.display = 'none';
+                    semServicosDiv.style.display = 'block';
+                    
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: 'Erro ao carregar serviços disponíveis.',
+                        icon: 'error'
+                    });
+                });
+        }
+
+        // Função para renderizar os serviços na lista
+        function renderizarServicos(servicos) {
+            const listaDiv = document.getElementById('listaServicos');
+            
+            listaDiv.innerHTML = servicos.map(servico => `
+                <div class="col-md-6 col-lg-4 servico-item" data-nome="${servico.nome.toLowerCase()}">
+                    <div class="card h-100 ${servico.jaVinculado ? 'border-warning' : 'border-primary'}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title text-primary mb-0">${servico.nome}</h6>
+                                ${servico.jaVinculado ? 
+                                    '<span class="badge bg-warning text-dark"><i class="fas fa-link me-1"></i>Vinculado</span>' : 
+                                    '<span class="badge bg-success"><i class="fas fa-plus me-1"></i>Disponível</span>'
+                                }
+                            </div>
+                            
+                            <p class="card-text text-muted small mb-3">${servico.descricao || 'Sem descrição'}</p>
+                            
+                            <div class="d-flex gap-2 mb-3">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-dollar-sign me-1"></i>${servico.valorFormatado}
+                                </span>
+                                <span class="badge bg-info">
+                                    <i class="fas fa-clock me-1"></i>${servico.duracaoFormatada}
+                                </span>
+                            </div>
+                            
+                            <div class="text-muted small mb-3">
+                                <i class="fas fa-store me-1"></i>${servico.lojaNome}
+                            </div>
+                            
+                            ${!servico.jaVinculado ? `
+                                <button type="button" class="btn btn-primary btn-sm w-100" 
+                                    onclick="vincularServico('${servico.id}', '${servico.nome}')">
+                                    <i class="fas fa-link me-1"></i>Vincular Serviço
+                                </button>
+                            ` : `
+                                <button type="button" class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                    <i class="fas fa-check me-1"></i>Já Vinculado
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função para vincular um serviço
+        function vincularServico(servicoId, servicoNome) {
+            Swal.fire({
+                title: 'Vincular Serviço',
+                text: `Deseja vincular o serviço "${servicoNome}" ao prestador?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, Vincular',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const prestadorId = '@Model.Id';
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    
+                    const formData = new FormData();
+                    formData.append('PrestadorId', prestadorId);
+                    formData.append('ServicoId', servicoId);
+                    formData.append('__RequestVerificationToken', token);
+
+                    fetch('@Url.Action("VincularServico", "Prestador")', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: data.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // Recarregar a página para atualizar a lista de serviços
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: data.message || 'Erro ao vincular serviço.',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'Erro de conexão. Verifique sua internet e tente novamente.',
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        }
+
+        // Filtro de busca em tempo real
+        document.getElementById('filtroServicos').addEventListener('input', function(e) {
+            const filtro = e.target.value.toLowerCase();
+            const servicos = document.querySelectorAll('.servico-item');
+            
+            servicos.forEach(servico => {
+                const nome = servico.getAttribute('data-nome');
+                if (nome.includes(filtro)) {
+                    servico.style.display = 'block';
+                } else {
+                    servico.style.display = 'none';
+                }
+            });
+        });
+
+        // Botão recarregar
+        document.getElementById('btnRecarregarServicos').addEventListener('click', function() {
+            carregarServicosDisponiveis();
+        });
+    </script>
+}

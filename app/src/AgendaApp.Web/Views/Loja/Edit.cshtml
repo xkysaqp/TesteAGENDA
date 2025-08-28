@@ -1,0 +1,244 @@
+@model EditarLojaViewModel
+
+@{
+    ViewData["Title"] = $"Editar Loja - {Model.Nome}";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-edit me-2"></i>Editar Loja
+        </h1>
+        <div>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info shadow-sm me-2">
+                <i class="fas fa-eye fa-sm text-white-50 me-2"></i>Ver Detalhes
+            </a>
+            <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50 me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-store me-2"></i>Informações da Loja
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" id="lojaForm">
+                        <input asp-for="Id" type="hidden">
+                        
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Corrija os erros abaixo:</strong>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Nome" class="form-control" placeholder="Nome da Loja" required>
+                                    <label asp-for="Nome"></label>
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Slug" class="form-control" placeholder="Slug" required>
+                                    <label asp-for="Slug"></label>
+                                    <span asp-validation-for="Slug" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Apenas letras, números e hífens
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="CNPJ" class="form-control" placeholder="CNPJ" required>
+                                    <label asp-for="CNPJ"></label>
+                                    <span asp-validation-for="CNPJ" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="EmailContato" type="email" class="form-control" placeholder="Email" required>
+                                    <label asp-for="EmailContato"></label>
+                                    <span asp-validation-for="EmailContato" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="TelefoneContato" class="form-control" placeholder="Telefone">
+                                    <label asp-for="TelefoneContato"></label>
+                                    <span asp-validation-for="TelefoneContato" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select asp-for="Plano" class="form-select" required>
+                                        <option value="">Selecione um plano</option>
+                                        @foreach (var plano in Enum.GetValues<AgendaApp.Dominio.Enums.TipoPlano>())
+                                        {
+                                            <option value="@((int)plano)">
+                                                @plano.ObterDescricao() - R$ @plano.ObterValorMensal().ToString("F2")
+                                            </option>
+                                        }
+                                    </select>
+                                    <label asp-for="Plano"></label>
+                                    <span asp-validation-for="Plano" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="DataVencimento" type="date" class="form-control">
+                                    <label asp-for="DataVencimento"></label>
+                                    <span asp-validation-for="DataVencimento" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input asp-for="Ativa" class="form-check-input" type="checkbox">
+                                    <label asp-for="Ativa" class="form-check-label">
+                                        <i class="fas fa-check-circle me-2"></i>Loja Ativa
+                                    </label>
+                                    <span asp-validation-for="Ativa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Status da Loja
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        @if (Model.Ativa)
+                        {
+                            <span class="badge bg-success fs-6">
+                                <i class="fas fa-check-circle me-1"></i>Loja Ativa
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6">
+                                <i class="fas fa-times-circle me-1"></i>Loja Inativa
+                            </span>
+                        }
+                    </div>
+
+                    @if (Model.DataVencimento.HasValue)
+                    {
+                        <div class="text-center">
+                            <h6>Vencimento da Assinatura</h6>
+                            <p class="text-muted">@Model.DataVencimento.Value.ToString("dd/MM/yyyy")</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <h6>Assinatura</h6>
+                            <p class="text-muted">Sem data de vencimento</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cog me-2"></i>Ações Avançadas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Delete" asp-route-id="@Model.Id" 
+                           class="btn btn-outline-danger btn-sm"
+                           onclick="return confirm('Tem certeza que deseja excluir esta loja?')">
+                            <i class="fas fa-trash me-2"></i>Excluir Loja
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Aplicar máscara CNPJ
+            $('#CNPJ').mask('00.000.000/0000-00');
+            
+            // Aplicar máscara telefone
+            $('#TelefoneContato').mask('(00) 00000-0000');
+            
+            // Validação de slug único
+            $('#Slug').on('blur', function() {
+                const slug = $(this).val();
+                const id = $('#Id').val();
+                if (slug) {
+                    $.get('@Url.Action("ValidarSlug")', { slug: slug, id: id })
+                        .done(function(data) {
+                            if (!data) {
+                                $('#Slug').addClass('is-invalid');
+                                $('#Slug').next('label').after('<div class="invalid-feedback">Este slug já está sendo usado.</div>');
+                            } else {
+                                $('#Slug').removeClass('is-invalid');
+                                $('#Slug').siblings('.invalid-feedback').remove();
+                            }
+                        });
+                }
+            });
+
+            // Validação de CNPJ único
+            $('#CNPJ').on('blur', function() {
+                const cnpj = $(this).val();
+                const id = $('#Id').val();
+                if (cnpj) {
+                    $.get('@Url.Action("ValidarCnpj")', { cnpj: cnpj, id: id })
+                        .done(function(data) {
+                            if (!data) {
+                                $('#CNPJ').addClass('is-invalid');
+                                $('#CNPJ').next('label').after('<div class="invalid-feedback">Este CNPJ já está cadastrado.</div>');
+                            } else {
+                                $('#CNPJ').removeClass('is-invalid');
+                                $('#CNPJ').siblings('.invalid-feedback').remove();
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+} 

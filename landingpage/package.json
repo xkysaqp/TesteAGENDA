@@ -1,0 +1,43 @@
+{
+  "name": "agendaapp-landing-page",
+  "version": "1.0.0",
+  "description": "Landing page moderna e responsiva para o sistema de agendamento AgendaApp",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8000 -o",
+    "dev": "http-server -p 8000 -o -c-1",
+    "build": "echo 'Landing page estática - não requer build'",
+    "serve": "python -m http.server 8000",
+    "lint:html": "htmlhint index.html",
+    "lint:css": "stylelint styles.css",
+    "lint:js": "eslint script.js",
+    "lint": "npm run lint:html && npm run lint:css && npm run lint:js",
+    "test": "echo 'Testes não configurados para landing page estática'",
+    "deploy": "echo 'Configure seu processo de deploy aqui'"
+  },
+  "keywords": [
+    "landing-page",
+    "agendamento",
+    "sistema",
+    "responsive",
+    "html5",
+    "css3",
+    "javascript"
+  ],
+  "author": "AgendaApp Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agendaapp/landing-page.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agendaapp/landing-page/issues"
+  },
+  "homepage": "https://agendaapp.com"
+} 

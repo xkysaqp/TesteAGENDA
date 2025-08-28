@@ -1,0 +1,116 @@
+@model AgendaApp.Web.ViewModels.ServicoViewModel
+@{
+    ViewData["Title"] = "Editar Serviço";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Editar Serviço
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" asp-controller="Servico" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="DataCriacao" type="hidden" />
+                        <input asp-for="LojaId" type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">
+                                        <i class="fas fa-tag me-2"></i>@Html.DisplayNameFor(m => m.Nome) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Nome do serviço" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="PrestadorId" class="form-label">
+                                        <i class="fas fa-user-md me-2"></i>@Html.DisplayNameFor(m => m.PrestadorId) <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="PrestadorId" asp-items="@ViewBag.Prestadores" class="form-select">
+                                        <option value="">Selecione um prestador...</option>
+                                    </select>
+                                    <span asp-validation-for="PrestadorId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label">
+                                <i class="fas fa-file-alt me-2"></i>@Html.DisplayNameFor(m => m.Descricao) <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o serviço oferecido"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Valor" class="form-label">
+                                        <i class="fas fa-dollar-sign me-2"></i>@Html.DisplayNameFor(m => m.Valor) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input asp-for="Valor" class="form-control" placeholder="0,00" />
+                                    </div>
+                                    <span asp-validation-for="Valor" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DuracaoEmMinutos" class="form-label">
+                                        <i class="fas fa-clock me-2"></i>@Html.DisplayNameFor(m => m.DuracaoEmMinutos) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="DuracaoEmMinutos" class="form-control" placeholder="60" />
+                                        <span class="input-group-text">min</span>
+                                    </div>
+                                    <span asp-validation-for="DuracaoEmMinutos" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="Ativo" class="form-check-input" />
+                                <label asp-for="Ativo" class="form-check-label">
+                                    @Html.DisplayNameFor(m => m.Ativo)
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Servico" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        // Máscara para valores monetários
+        $(document).ready(function() {
+            $('#Valor').mask('#.##0,00', {reverse: true});
+        });
+    </script>
+} 

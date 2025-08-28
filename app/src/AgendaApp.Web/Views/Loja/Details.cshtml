@@ -1,0 +1,229 @@
+@model LojaViewModel
+
+@{
+    ViewData["Title"] = $"Detalhes - {Model.Nome}";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-store me-2"></i>@Model.Nome
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm me-2">
+                <i class="fas fa-edit fa-sm text-white-50 me-2"></i>Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50 me-2"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Informações Principais -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Informações da Loja
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Nome da Loja</label>
+                                <div class="h5">@Model.Nome</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Slug</label>
+                                <div><code class="h6">@Model.Slug</code></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-muted">CNPJ</label>
+                                <div class="h6">@Model.CNPJ</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Email de Contato</label>
+                                <div>
+                                    <a href="mailto:@Model.EmailContato" class="h6 text-decoration-none">
+                                        <i class="fas fa-envelope me-2"></i>@Model.EmailContato
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.TelefoneContato))
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label class="form-label text-muted">Telefone de Contato</label>
+                                    <div class="h6">
+                                        <i class="fas fa-phone me-2"></i>@Model.TelefoneContato
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-muted">Plano</label>
+                                <div class="h6">
+                                    <i class="fas fa-crown me-2"></i>
+                                    @Model.Plano.ObterDescricao()
+                                    <small class="text-muted">(R$ @Model.Plano.ObterValorMensal().ToString("F2")/mês)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Data de Criação</label>
+                                <div>@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                        @if (Model.DataAtualizacao.HasValue)
+                        {
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Última Atualização</label>
+                                    <div>@Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status e Informações Adicionais -->
+        <div class="col-lg-4">
+            <!-- Status da Loja -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-circle me-2"></i>Status
+                    </h6>
+                </div>
+                <div class="card-body text-center">
+                    @if (Model.Ativa)
+                    {
+                        <div class="mb-3">
+                            <i class="fas fa-check-circle fa-3x text-success"></i>
+                        </div>
+                        <h5 class="text-success">Loja Ativa</h5>
+                        <p class="text-muted">A loja está funcionando normalmente</p>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <i class="fas fa-times-circle fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="text-danger">Loja Inativa</h5>
+                        <p class="text-muted">A loja está desativada</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Vencimento -->
+            @if (Model.DataVencimento.HasValue)
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-calendar me-2"></i>Assinatura
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            @if (Model.Vencida)
+                            {
+                                <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
+                            }
+                            else if (Model.VencimentoProximo)
+                            {
+                                <i class="fas fa-clock fa-3x text-warning"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-check-circle fa-3x text-success"></i>
+                            }
+                        </div>
+                        
+                        <h6>Vence em</h6>
+                        <div class="h5 @Model.ClasseStatusVencimento">
+                            @Model.DataVencimento.Value.ToString("dd/MM/yyyy")
+                        </div>
+                        <p class="@Model.ClasseStatusVencimento mb-0">
+                            @Model.StatusVencimento
+                        </p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-infinity me-2"></i>Assinatura
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-infinity fa-3x text-success"></i>
+                        </div>
+                        <h5 class="text-success">Ilimitada</h5>
+                        <p class="text-muted">Sem data de vencimento</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Ações -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cog me-2"></i>Ações
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Editar Loja
+                        </a>
+                        
+                        <a asp-action="Delete" asp-route-id="@Model.Id" 
+                           class="btn btn-outline-danger"
+                           onclick="return confirm('Tem certeza que deseja excluir esta loja?')">
+                            <i class="fas fa-trash me-2"></i>Excluir Loja
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

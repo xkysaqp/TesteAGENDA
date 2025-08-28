@@ -1,0 +1,125 @@
+@model AgendaApp.Web.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Registrar Usuário";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Registrar Novo Usuário
+                    </h4>
+                    <small>Apenas administradores podem criar novos usuários</small>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Register" asp-controller="Account" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">@Html.DisplayNameFor(m => m.Nome)</label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Nome completo do usuário" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">@Html.DisplayNameFor(m => m.Email)</label>
+                                    <input asp-for="Email" class="form-control" placeholder="email@exemplo.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Telefone" class="form-label">@Html.DisplayNameFor(m => m.Telefone)</label>
+                                    <input asp-for="Telefone" class="form-control" placeholder="(11) 99999-9999" />
+                                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="LojaId" class="form-label">@Html.DisplayNameFor(m => m.LojaId)</label>
+                                    <select asp-for="LojaId" class="form-select">
+                                        <option value="">Admin Global</option>
+                                        <!-- TODO: Carregar lojas dinamicamente -->
+                                    </select>
+                                    <div class="form-text">Deixe vazio para criar um administrador global</div>
+                                    <span asp-validation-for="LojaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Password" class="form-label">@Html.DisplayNameFor(m => m.Password)</label>
+                                    <input asp-for="Password" class="form-control" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label">@Html.DisplayNameFor(m => m.ConfirmPassword)</label>
+                                    <input asp-for="ConfirmPassword" class="form-control" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CNPJ" class="form-label">@Html.DisplayNameFor(m => m.CNPJ)</label>
+                                    <input asp-for="CNPJ" class="form-control" placeholder="00.000.000/0000-00" />
+                                    <span asp-validation-for="CNPJ" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="AreaAtuacao" class="form-label">@Html.DisplayNameFor(m => m.AreaAtuacao)</label>
+                                    <input asp-for="AreaAtuacao" class="form-control" placeholder="Ex: Medicina, Advocacia..." />
+                                    <span asp-validation-for="AreaAtuacao" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-plus me-2"></i>Criar Usuário
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        // Máscara para telefone e CNPJ
+        $(document).ready(function() {
+            $('#Telefone').mask('(00) 00000-0000');
+            $('#CNPJ').mask('00.000.000/0000-00');
+        });
+    </script>
+} 

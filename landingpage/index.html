@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgendaApp - Sistema de Agendamento Inteligente</title>
+    <meta name="description" content="Sistema completo de agendamento para empresas e profissionais autônomos. Gerencie horários, clientes e serviços de forma eficiente.">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>AgendaApp</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#features">Recursos</a></li>
+                    <li><a href="#pricing">Preços</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                    <li><a href="/app" class="btn-primary">Acessar Sistema</a></li>
+                </ul>
+                <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Gerencie seus <span class="highlight">agendamentos</span> de forma inteligente
+                </h1>
+                <p class="hero-description">
+                    Sistema completo para empresas e profissionais autônomos. Organize horários, 
+                    gerencie clientes e otimize sua agenda com ferramentas poderosas e intuitivas.
+                </p>
+                <div class="hero-buttons">
+                    <a href="/app" class="btn-primary btn-large">
+                        <i class="fas fa-rocket"></i>
+                        Começar Agora
+                    </a>
+                    <a href="#features" class="btn-secondary btn-large">
+                        <i class="fas fa-play"></i>
+                        Ver Recursos
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-card">
+                    <div class="calendar-mockup">
+                        <div class="calendar-header">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Agenda Inteligente</span>
+                        </div>
+                        <div class="calendar-body">
+                            <div class="calendar-day active">
+                                <span class="day-number">15</span>
+                                <span class="day-name">Hoje</span>
+                            </div>
+                            <div class="calendar-day">
+                                <span class="day-number">16</span>
+                                <span class="day-name">Amanhã</span>
+                            </div>
+                            <div class="calendar-day">
+                                <span class="day-number">17</span>
+                                <span class="day-name">Qua</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Recursos Principais</h2>
+                <p>Tudo que você precisa para gerenciar sua agenda de forma eficiente</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3>Agendamento Inteligente</h3>
+                    <p>Sistema de agendamento automatizado com confirmações e lembretes para seus clientes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Gestão de Clientes</h3>
+                    <p>Cadastre e gerencie seus clientes com histórico completo de agendamentos e preferências.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Horários Flexíveis</h3>
+                    <p>Configure horários de trabalho, pausas e disponibilidade de forma personalizada.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Relatórios Detalhados</h3>
+                    <p>Acompanhe o desempenho do seu negócio com relatórios e estatísticas em tempo real.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Responsivo</h3>
+                    <p>Acesse sua agenda de qualquer dispositivo, desktop, tablet ou smartphone.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Seguro e Confiável</h3>
+                    <p>Seus dados protegidos com criptografia e backup automático em nuvem.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Planos e Preços</h2>
+                <p>Escolha o plano ideal para o seu negócio</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Básico</h3>
+                        <div class="price">
+                            <span class="currency">R$</span>
+                            <span class="amount">29</span>
+                            <span class="period">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Até 100 agendamentos/mês</li>
+                        <li><i class="fas fa-check"></i> 1 profissional</li>
+                        <li><i class="fas fa-check"></i> Horários básicos</li>
+                        <li><i class="fas fa-check"></i> Suporte por email</li>
+                    </ul>
+                    <a href="/app" class="btn-secondary">Começar Grátis</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Mais Popular</div>
+                    <div class="pricing-header">
+                        <h3>Profissional <span class="coming-soon">(Em Breve)</span></h3>
+                        <div class="price">
+                            <span class="currency">R$</span>
+                            <span class="amount">59</span>
+                            <span class="period">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Agendamentos ilimitados</li>
+                        <li><i class="fas fa-check"></i> Até 5 profissionais</li>
+                        <li><i class="fas fa-check"></i> Horários avançados</li>
+                        <li><i class="fas fa-check"></i> Relatórios detalhados</li>
+                        <li><i class="fas fa-check"></i> Suporte prioritário</li>
+                    </ul>
+                    <a href="/app" class="btn-primary disabled">Em Breve</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Empresarial <span class="coming-soon">(Em Breve)</span></h3>
+                        <div class="price">
+                            <span class="currency">R$</span>
+                            <span class="amount">99</span>
+                            <span class="period">/mês</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Agendamentos ilimitados</li>
+                        <li><i class="fas fa-check"></i> Profissionais ilimitados</li>
+                        <li><i class="fas fa-check"></i> Múltiplas lojas</li>
+                        <li><i class="fas fa-check"></i> API personalizada</li>
+                        <li><i class="fas fa-check"></i> Suporte 24/7</li>
+                    </ul>
+                    <a href="/app" class="btn-secondary disabled">Em Breve</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>Entre em Contato</h2>
+                    <p>Estamos aqui para ajudar você a otimizar sua agenda e melhorar seu negócio.</p>
+                    <div class="contact-items">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>contato@agendaapp.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Telefone</h4>
+                                <p>(11) 99999-9999</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Endereço</h4>
+                                <p>São Paulo, SP - Brasil</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" id="name" name="name" placeholder="Seu nome" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" placeholder="Seu email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="subject" name="subject" placeholder="Assunto" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" name="message" placeholder="Sua mensagem" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary btn-full">Enviar Mensagem</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>AgendaApp</span>
+                    </div>
+                    <p>Sistema completo de agendamento para empresas e profissionais autônomos.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Produto</h4>
+                    <ul>
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#pricing">Preços</a></li>
+                        <li><a href="/app">Acessar Sistema</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Suporte</h4>
+                    <ul>
+                        <li><a href="#">Central de Ajuda</a></li>
+                        <li><a href="#">Documentação</a></li>
+                        <li><a href="#contact">Contato</a></li>
+                        <li><a href="#">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Empresa</h4>
+                    <ul>
+                        <li><a href="#">Sobre Nós</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Carreiras</a></li>
+                        <li><a href="#">Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AgendaApp. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

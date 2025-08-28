@@ -1,0 +1,174 @@
+@model IEnumerable<HorarioDisponivelListViewModel>
+@{
+    ViewData["Title"] = "Horários Disponíveis";
+    var filtro = ViewBag.Filtro as HorarioDisponivelFiltroViewModel ?? new HorarioDisponivelFiltroViewModel();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-clock"></i> Horários Disponíveis</h2>
+    <div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Horário
+        </a>
+        <a asp-action="CreateMultiple" class="btn btn-success">
+            <i class="fas fa-calendar-plus"></i> Múltiplos Horários
+        </a>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse">
+                <i class="fas fa-filter"></i> Filtros
+            </button>
+        </h5>
+    </div>
+    <div class="collapse @(filtro.PrestadorId.HasValue || filtro.DiaSemana.HasValue || filtro.HoraMinima.HasValue || filtro.HoraMaxima.HasValue ? "show" : "")" id="filtrosCollapse">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Prestador</label>
+                    <select name="PrestadorId" class="form-select">
+                        <option value="">Todos os prestadores</option>
+                        @foreach (var prestador in (SelectList)ViewBag.Prestadores)
+                        {
+                            <option value="@prestador.Value" selected="@(prestador.Value == filtro.PrestadorId?.ToString())">@prestador.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Dia da Semana</label>
+                    <select name="DiaSemana" class="form-select">
+                        <option value="">Todos os dias</option>
+                        @foreach (var dia in (SelectList)ViewBag.DiasSemana)
+                        {
+                            <option value="@dia.Value" selected="@(dia.Value == ((int?)filtro.DiaSemana)?.ToString())">@dia.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Hora Mínima</label>
+                    <input type="time" name="HoraMinima" class="form-control" value="@filtro.HoraMinima?.ToString("HH:mm")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Hora Máxima</label>
+                    <input type="time" name="HoraMaxima" class="form-control" value="@filtro.HoraMaxima?.ToString("HH:mm")" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Resultado -->
+@if (Model.Any())
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Prestador</th>
+                            <th>Dia da Semana</th>
+                            <th>Horário</th>
+                            <th>Duração</th>
+                            <th>Status</th>
+                            <th>Data Criação</th>
+                            <th width="120">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var horario in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <i class="fas fa-user-md text-primary me-1"></i>
+                                    @horario.PrestadorNome
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        @horario.DiaSemanaTexto
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>@horario.HorarioFormatado</strong>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@horario.DuracaoFormatada</small>
+                                </td>
+                                <td>
+                                    @if (horario.Ativo)
+                                    {
+                                        <span class="badge bg-success">Ativo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inativo</span>
+                                    }
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        @horario.DataCriacao.ToString("dd/MM/yyyy")
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@horario.Id" class="btn btn-outline-info" title="Detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@horario.Id" class="btn btn-outline-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-delete-ajax" 
+                                                title="Excluir"
+                                                data-delete-url="@Url.Action("DeleteAjax", "HorarioDisponivel", new { id = horario.Id })"
+                                                data-item-name="o horário '@horario.DiaSemanaTexto @horario.HorarioFormatado'"
+                                                data-confirm-message="Tem certeza que deseja excluir o horário '@horario.DiaSemanaTexto @horario.HorarioFormatado'?"
+                                                data-item-details="<strong>Prestador:</strong> @horario.PrestadorNome<br><strong>Duração:</strong> @horario.DuracaoFormatada<br><strong>Status:</strong> @(horario.Ativo ? "Ativo" : "Inativo")">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="text-muted">
+                    @Model.Count() horário(s) encontrado(s)
+                </small>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum horário encontrado</h5>
+            <p class="text-muted mb-4">
+                @if (filtro.PrestadorId.HasValue || filtro.DiaSemana.HasValue || filtro.HoraMinima.HasValue || filtro.HoraMaxima.HasValue)
+                {
+                    <span>Tente ajustar os filtros ou </span>
+                }
+                <span>comece criando o primeiro horário disponível.</span>
+            </p>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Criar Primeiro Horário
+            </a>
+        </div>
+    </div>
+} 

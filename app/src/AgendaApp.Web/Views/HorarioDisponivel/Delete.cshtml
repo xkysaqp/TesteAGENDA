@@ -1,0 +1,202 @@
+@model HorarioDisponivelViewModel
+@{
+    ViewData["Title"] = "Excluir Horário";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-danger"><i class="fas fa-trash"></i> Excluir Horário</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar à Lista
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Aviso de confirmação -->
+        <div class="alert alert-danger">
+            <h5 class="alert-heading">
+                <i class="fas fa-exclamation-triangle me-1"></i>Atenção!
+            </h5>
+            <p class="mb-0">
+                Você está prestes a <strong>excluir</strong> este horário disponível. 
+                Esta ação não pode ser desfeita.
+            </p>
+        </div>
+        
+        <!-- Informações do horário a ser excluído -->
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-1"></i>Horário a ser Excluído
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Prestador</label>
+                        <div class="fw-bold">
+                            <i class="fas fa-user-md text-primary me-1"></i>
+                            @(Model.PrestadorNome ?? "Não informado")
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Dia da Semana</label>
+                        <div class="fw-bold">
+                            <span class="badge bg-info fs-6">
+                                @Model.DiaSemanaTexto
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Horário</label>
+                        <div class="fw-bold fs-5">
+                            <i class="fas fa-clock text-warning me-1"></i>
+                            @Model.HorarioFormatado
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Status Atual</label>
+                        <div>
+                            @if (Model.Ativo)
+                            {
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check-circle me-1"></i>Ativo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">
+                                    <i class="fas fa-times-circle me-1"></i>Inativo
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                @if (Model.DataCriacao.HasValue)
+                {
+                    <div class="alert alert-light mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Criado em:</strong> @Model.DataCriacao.Value.ToString("dd/MM/yyyy 'às' HH:mm")
+                        </small>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <!-- Consequências da exclusão -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-exclamation-circle text-warning me-1"></i>
+                    O que acontecerá após a exclusão?
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Este horário será <strong>permanentemente removido</strong> do sistema</li>
+                    <li>O prestador não estará mais disponível neste dia e horário</li>
+                    <li>Novos agendamentos não poderão ser feitos neste período</li>
+                    @if (Model.Ativo)
+                    {
+                        <li class="text-warning">
+                            <strong>Atenção:</strong> Este horário está ativo e pode afetar agendamentos existentes
+                        </li>
+                    }
+                    <li>Se desejar apenas desativar temporariamente, use a opção "Editar" em vez de excluir</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Formulário de confirmação -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <form asp-action="Delete" method="post" id="deleteForm">
+                    <input asp-for="Id" type="hidden" />
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info me-2">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i> Editar em Vez de Excluir
+                            </a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">
+                            <i class="fas fa-trash"></i> Confirmar Exclusão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Alternativas -->
+        <div class="card mt-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-1"></i>Alternativas à Exclusão
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Considere estas opções antes de excluir definitivamente:</p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-success">
+                        <i class="fas fa-pause me-1"></i> Desativar Temporariamente
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                        <i class="fas fa-clock me-1"></i> Alterar Horários
+                    </a>
+                    <a asp-action="CreateMultiple" class="btn btn-outline-info">
+                        <i class="fas fa-copy me-1"></i> Criar Horário Similar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmação adicional antes do envio
+            $('#deleteForm').submit(function(e) {
+                const confirmacao = confirm(
+                    'ATENÇÃO: Esta ação é IRREVERSÍVEL!\n\n' +
+                    'Tem certeza que deseja EXCLUIR PERMANENTEMENTE este horário?\n\n' +
+                    'Horário: @Model.DiaSemanaTexto - @Model.HorarioFormatado\n' +
+                    'Prestador: @(Model.PrestadorNome ?? "Não informado")\n\n' +
+                    'Digite OK para confirmar ou Cancelar para voltar.'
+                );
+                
+                if (!confirmacao) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Desabilitar botão para evitar cliques duplos
+                $('#confirmDeleteBtn').prop('disabled', true).html(
+                    '<i class="fas fa-spinner fa-spin"></i> Excluindo...'
+                );
+            });
+            
+            // Destacar botão perigoso
+            $('#confirmDeleteBtn').hover(
+                function() {
+                    $(this).removeClass('btn-danger').addClass('btn-outline-danger');
+                },
+                function() {
+                    $(this).removeClass('btn-outline-danger').addClass('btn-danger');
+                }
+            );
+        });
+    </script>
+} 

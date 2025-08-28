@@ -1,0 +1,92 @@
+@model AgendaApp.Web.ViewModels.ServicoViewModel
+@{
+    ViewData["Title"] = "Detalhes do Serviço";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Detalhes do Serviço
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>@Html.DisplayNameFor(m => m.Nome):</strong>
+                            <p class="fs-5 text-primary">@Model.Nome</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong>
+                            @if (Model.Ativo)
+                            {
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check me-1"></i>Ativo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger fs-6">
+                                    <i class="fas fa-times me-1"></i>Inativo
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>@Html.DisplayNameFor(m => m.Descricao):</strong>
+                            <p class="text-muted">@Model.Descricao</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>@Html.DisplayNameFor(m => m.Valor):</strong>
+                            <p class="fs-4 text-success fw-bold">@Model.ValorFormatado</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>@Html.DisplayNameFor(m => m.DuracaoEmMinutos):</strong>
+                            <p class="fs-5">
+                                <i class="fas fa-clock text-muted me-2"></i>@Model.DuracaoFormatada
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Prestador:</strong>
+                            <p class="fs-5">
+                                <i class="fas fa-user-md text-primary me-2"></i>@Model.PrestadorNome
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>@Html.DisplayNameFor(m => m.DataCriacao):</strong>
+                            <p class="text-muted">
+                                <i class="fas fa-calendar me-2"></i>@Model.DataCriacao
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Servico" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+                        </a>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Excluir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

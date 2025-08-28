@@ -1,0 +1,235 @@
+@model List<AgendaApp.Web.ViewModels.PrestadorListViewModel>
+@{
+    ViewData["Title"] = "Prestadores";
+    var filtro = ViewBag.Filtro as AgendaApp.Web.ViewModels.PrestadorFiltroViewModel;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-user-md text-primary me-2"></i>Prestadores
+            @if (ViewBag.IsLojaUser == true)
+            {
+                <small class="text-muted">da sua loja</small>
+            }
+        </h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Novo Prestador
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-filter me-2"></i>Filtros
+            </h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="get">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="Nome" class="form-label">Nome</label>
+                            <input name="Nome" value="@filtro?.Nome" class="form-control" placeholder="Buscar por nome..." />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="AreaAtuacao" class="form-label">Área de Atuação</label>
+                            <input name="AreaAtuacao" value="@filtro?.AreaAtuacao" class="form-control" placeholder="Ex: Medicina..." />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input name="Email" value="@filtro?.Email" class="form-control" placeholder="email@exemplo.com" />
+                        </div>
+                    </div>
+                    @if (ViewBag.IsLojaUser != true)
+                    {
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="LojaId" class="form-label">Loja</label>
+                                <select name="LojaId" asp-items="@ViewBag.Lojas" class="form-select">
+                                    <option value="">Todas as lojas</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="ApenasAtivos" value="true" 
+                                   @(filtro?.ApenasAtivos != false ? "checked" : "") />
+                            <label class="form-check-label" for="ApenasAtivos">
+                                Apenas ativos
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-search me-2"></i>Filtrar
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Lista de Prestadores -->
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <i class="fas fa-user me-1"></i>Nome
+                                </th>
+                                <th>
+                                    <i class="fas fa-briefcase me-1"></i>Área
+                                </th>
+                                <th>
+                                    <i class="fas fa-envelope me-1"></i>Email
+                                </th>
+                                <th>
+                                    <i class="fas fa-phone me-1"></i>Telefone
+                                </th>
+                                <th>
+                                    <i class="fas fa-cogs me-1"></i>Serviços
+                                </th>
+                                <th>
+                                    <i class="fas fa-toggle-on me-1"></i>Status
+                                </th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var prestador in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center" 
+                                                 style="width: 32px; height: 32px; border-radius: 50%; font-size: 0.8rem;">
+                                                @prestador.Nome.FirstOrDefault()
+                                            </div>
+                                            <div>
+                                                <strong>@prestador.Nome</strong>
+                                                @if (!string.IsNullOrEmpty(prestador.CNPJ))
+                                                {
+                                                    <br><small class="text-muted">CNPJ: @prestador.CNPJ</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">@prestador.AreaAtuacao</span>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:@prestador.Email" class="text-decoration-none">
+                                            @prestador.Email
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="tel:@prestador.Telefone" class="text-decoration-none">
+                                            @prestador.Telefone
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@prestador.TotalServicos serviços</span>
+                                        <span class="badge bg-secondary">@prestador.TotalHorarios horários</span>
+                                    </td>
+                                    <td>
+                                        @if (prestador.Ativo)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Ativo
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Inativo
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@prestador.Id" 
+                                               class="btn btn-sm btn-outline-info" title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@prestador.Id" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-ajax" 
+                                                    title="Excluir"
+                                                    data-delete-url="@Url.Action("DeleteAjax", "Prestador", new { id = prestador.Id })"
+                                                    data-item-name="o prestador '@prestador.Nome'"
+                                                    data-confirm-message="Tem certeza que deseja excluir o prestador '@prestador.Nome'?"
+                                                    data-item-details="<strong>Área:</strong> @prestador.AreaAtuacao<br><strong>Email:</strong> @prestador.Email<br><strong>Telefone:</strong> @prestador.Telefone<br><strong>Status:</strong> @(prestador.Ativo ? "Ativo" : "Inativo")">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum prestador encontrado</h5>
+                    <p class="text-muted">
+                        @if (filtro != null && (!string.IsNullOrEmpty(filtro.Nome) || !string.IsNullOrEmpty(filtro.AreaAtuacao) || !string.IsNullOrEmpty(filtro.Email)))
+                        {
+                            <span>Tente ajustar os filtros ou </span>
+                        }
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>cadastre o primeiro prestador
+                        </a>
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+} 

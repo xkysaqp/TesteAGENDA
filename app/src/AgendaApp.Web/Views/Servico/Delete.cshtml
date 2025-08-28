@@ -1,0 +1,93 @@
+@model AgendaApp.Web.ViewModels.ServicoViewModel
+@{
+    ViewData["Title"] = "Excluir Serviço";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita. O serviço será desativado permanentemente.
+                    </div>
+
+                    <h5 class="text-danger mb-3">Você tem certeza que deseja excluir este serviço?</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Nome:</strong>
+                            <p class="fs-5">@Model.Nome</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong>
+                            @if (Model.Ativo)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Ativo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Inativo
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Descrição:</strong>
+                            <p class="text-muted">@Model.Descricao</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Valor:</strong>
+                            <p class="text-success fw-bold">@Model.ValorFormatado</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Duração:</strong>
+                            <p><i class="fas fa-clock text-muted me-2"></i>@Model.DuracaoFormatada</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Prestador:</strong>
+                            <p><i class="fas fa-user-md text-primary me-2"></i>@Model.PrestadorNome</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Criado em:</strong>
+                                                         <p class="text-muted">
+                                 <i class="fas fa-calendar me-2"></i>@Model.DataCriacao
+                             </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Servico" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Tem certeza que deseja excluir este serviço?')">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

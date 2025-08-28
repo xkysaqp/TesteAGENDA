@@ -1,0 +1,298 @@
+@model AgendamentoViewModel
+@using AgendaApp.Dominio.Entities
+@{
+    ViewData["Title"] = $"Agendamento - {Model.ClienteNome}";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Detalhes do Agendamento
+                    </h4>
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light">
+                            <i class="fas fa-edit me-2"></i>Editar
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Status do Agendamento -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            @{
+                                var statusClass = Model.Status switch
+                                {
+                                    StatusAgendamento.Pendente => "warning",
+                                    StatusAgendamento.Confirmado => "info",
+                                    StatusAgendamento.Cancelado => "danger",
+                                    StatusAgendamento.Concluido => "success",
+                                    _ => "secondary"
+                                };
+                                var statusText = Model.Status switch
+                                {
+                                    StatusAgendamento.Pendente => "Pendente",
+                                    StatusAgendamento.Confirmado => "Confirmado",
+                                    StatusAgendamento.Cancelado => "Cancelado",
+                                    StatusAgendamento.Concluido => "Concluído",
+                                    _ => "Indefinido"
+                                };
+                            }
+                            <div class="alert alert-@statusClass d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Status:</strong> @statusText
+                                </div>
+                                <div class="btn-group" role="group">
+                                    @if (Model.Status == StatusAgendamento.Pendente)
+                                    {
+                                        <button type="button" class="btn btn-success btn-sm" onclick="confirmarAgendamento()">
+                                            <i class="fas fa-check me-1"></i>Confirmar
+                                        </button>
+                                    }
+                                    @if (Model.Status == StatusAgendamento.Confirmado)
+                                    {
+                                        <button type="button" class="btn btn-info btn-sm" onclick="concluirAgendamento()">
+                                            <i class="fas fa-flag-checkered me-1"></i>Concluir
+                                        </button>
+                                    }
+                                    @if (Model.Status != StatusAgendamento.Cancelado && Model.Status != StatusAgendamento.Concluido)
+                                    {
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="cancelarAgendamento()">
+                                            <i class="fas fa-times me-1"></i>Cancelar
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Cliente -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-user me-2"></i>Informações do Cliente
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Nome:</strong> @Model.ClienteNome
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Telefone:</strong> @Model.ClienteTelefone
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.ClienteEmail))
+                                {
+                                    <div class="col-md-6 mt-2">
+                                        <strong>E-mail:</strong> @Model.ClienteEmail
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Agendamento -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-calendar-alt me-2"></i>Informações do Agendamento
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Data:</strong> @Model.Data.ToString("dd/MM/yyyy")
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Hora:</strong> @Model.Hora.ToString("HH:mm")
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Loja:</strong> @Model.LojaNome
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Serviço:</strong> @Model.ServicoNome
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Prestador:</strong> @Model.PrestadorNome
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Duração:</strong> @Model.ServicoDuracaoEmMinutos minutos
+                                </div>
+                                <div class="col-md-6 mt-2">
+                                    <strong>Valor do Serviço:</strong> R$ @Model.ServicoValor.ToString("N2")
+                                </div>
+                                @if (Model.Valor.HasValue)
+                                {
+                                    <div class="col-md-6 mt-2">
+                                        <strong>Valor Final:</strong> <span class="text-success fw-bold">R$ @Model.Valor.Value.ToString("N2")</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    @if (!string.IsNullOrEmpty(Model.Observacoes))
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="fas fa-sticky-note me-2"></i>Observações
+                                </h5>
+                                <p class="mb-0">@Model.Observacoes</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Informações de Status -->
+                    @if (Model.Status == StatusAgendamento.Confirmado && Model.DataConfirmacao.HasValue)
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Confirmação
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Data de Confirmação:</strong> @Model.DataConfirmacao.Value.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Status == StatusAgendamento.Cancelado)
+                    {
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="fas fa-times-circle me-2"></i>Cancelamento
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Data de Cancelamento:</strong> @Model.DataCancelamento?.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Motivo:</strong> @Model.MotivoCancelamento
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Informações do Sistema -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2">
+                                <i class="fas fa-info-circle me-2"></i>Informações do Sistema
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Data de Criação:</strong> @Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                                @if (Model.DataAtualizacao.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <strong>Última Atualização:</strong> @Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-action="Confirmar" asp-route-id="@Model.Id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Valor (opcional)</label>
+                        <input type="number" name="valor" class="form-control" step="0.01" min="0" placeholder="Deixe em branco para usar o valor padrão">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Conclusão -->
+<div class="modal fade" id="concluirModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Concluir Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-action="Concluir" asp-route-id="@Model.Id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Valor Final (opcional)</label>
+                        <input type="number" name="valorFinal" class="form-control" step="0.01" min="0" placeholder="Deixe em branco para manter o valor atual">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info">Concluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cancelamento -->
+<div class="modal fade" id="cancelarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancelar Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-action="Cancelar" asp-route-id="@Model.Id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Motivo do Cancelamento</label>
+                        <textarea name="motivo" class="form-control" rows="3" required placeholder="Informe o motivo do cancelamento"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Confirmar Cancelamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarAgendamento() {
+            const modal = new bootstrap.Modal(document.getElementById('confirmarModal'));
+            modal.show();
+        }
+
+        function concluirAgendamento() {
+            const modal = new bootstrap.Modal(document.getElementById('concluirModal'));
+            modal.show();
+        }
+
+        function cancelarAgendamento() {
+            const modal = new bootstrap.Modal(document.getElementById('cancelarModal'));
+            modal.show();
+        }
+    </script>
+}

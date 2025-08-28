@@ -1,0 +1,290 @@
+@model AgendaApp.Web.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <!-- Header com boas-vindas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title mb-1">
+                                <i class="fas fa-tachometer-alt me-2"></i>@Model.MensagemBoasVindas
+                            </h2>
+                            <p class="card-text mb-0">
+                                <i class="fas fa-user-tag me-2"></i>@Model.TipoUsuario
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-chart-line fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Prestadores
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalPrestadores</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-md fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total de Serviços
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalServicos</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-cogs fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Agendamentos (Em breve)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalAgendamentos</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Receita (Em breve)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ReceitaTotal.ToString("C")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos e ações rápidas -->
+    <div class="row">
+        <!-- Gráfico -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                                                @if (Model.EhAdmin)
+                        {
+                            <text><i class="fas fa-chart-pie me-2"></i>Serviços por Loja</text>
+                        }
+                        else
+                        {
+                            <text><i class="fas fa-chart-bar me-2"></i>Serviços por Prestador</text>
+                        }
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.DadosGraficos.Any())
+                    {
+                        <canvas id="dashboardChart" width="100%" height="30"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-bar fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-muted">Não há dados suficientes para exibir o gráfico.</p>
+                            <p class="text-muted">
+                                @if (Model.EhAdmin)
+                                {
+                                    <text>Aguarde que as lojas cadastrem serviços.</text>
+                                }
+                                else
+                                {
+                                    <text>Cadastre prestadores e serviços para ver as estatísticas.</text>
+                                }
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-rocket me-2"></i>Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        @if (Model.EhAdmin)
+                        {
+                            <a asp-controller="Prestador" asp-action="Create" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-user-plus text-primary me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Novo Prestador</div>
+                                    <small class="text-muted">Cadastrar novo prestador</small>
+                                </div>
+                            </a>
+                            <a asp-controller="Servico" asp-action="Create" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-plus-circle text-success me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Novo Serviço</div>
+                                    <small class="text-muted">Cadastrar novo serviço</small>
+                                </div>
+                            </a>
+                            <a asp-controller="Account" asp-action="Register" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-user-cog text-info me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Novo Usuário</div>
+                                    <small class="text-muted">Criar conta de usuário</small>
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Prestador" asp-action="Create" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-user-plus text-primary me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Novo Prestador</div>
+                                    <small class="text-muted">Adicionar prestador à sua loja</small>
+                                </div>
+                            </a>
+                            <a asp-controller="Servico" asp-action="Create" class="list-group-item list-group-item-action d-flex align-items-center">
+                                <i class="fas fa-plus-circle text-success me-3"></i>
+                                <div>
+                                    <div class="fw-bold">Novo Serviço</div>
+                                    <small class="text-muted">Criar serviço para sua loja</small>
+                                </div>
+                            </a>
+                        }
+                        
+                        <a asp-controller="Prestador" asp-action="Index" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-list text-secondary me-3"></i>
+                            <div>
+                                <div class="fw-bold">Ver Prestadores</div>
+                                <small class="text-muted">Listar todos os prestadores</small>
+                            </div>
+                        </a>
+                        <a asp-controller="Servico" asp-action="Index" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-list-alt text-secondary me-3"></i>
+                            <div>
+                                <div class="fw-bold">Ver Serviços</div>
+                                <small class="text-muted">Listar todos os serviços</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dados do gráfico vindos do servidor
+        var dadosGraficos = @Html.Raw(Json.Serialize(Model.DadosGraficos));
+        
+        if (dadosGraficos && dadosGraficos.length > 0) {
+            var ctx = document.getElementById('dashboardChart').getContext('2d');
+            var dashboardChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: dadosGraficos.map(item => item.label || item.Label),
+                    datasets: [{
+                        data: dadosGraficos.map(item => item.value || item.Value),
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a', 
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#e74a3b',
+                            '#858796',
+                            '#5a5c69',
+                            '#6f42c1',
+                            '#e83e8c',
+                            '#fd7e14'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+        .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+        .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+        .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+        .text-xs {
+            font-size: 0.7rem;
+        }
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+        .text-gray-300 {
+            color: #dddfeb !important;
+        }
+    </style>
+} 

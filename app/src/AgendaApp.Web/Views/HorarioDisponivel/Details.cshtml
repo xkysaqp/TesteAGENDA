@@ -1,0 +1,216 @@
+@model HorarioDisponivelViewModel
+@{
+    ViewData["Title"] = "Detalhes do Horário";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-eye"></i> Detalhes do Horário</h2>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Informações principais -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock"></i> Informações do Horário
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Prestador</label>
+                        <div class="fw-bold">
+                            <i class="fas fa-user-md text-primary me-1"></i>
+                            @(Model.PrestadorNome ?? "Não informado")
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Dia da Semana</label>
+                        <div class="fw-bold">
+                            <span class="badge bg-info fs-6">
+                                @Model.DiaSemanaTexto
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Horário de Início</label>
+                        <div class="fw-bold fs-5">
+                            <i class="fas fa-play-circle text-success me-1"></i>
+                            @Model.HoraInicio.ToString("HH:mm")
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Horário de Fim</label>
+                        <div class="fw-bold fs-5">
+                            <i class="fas fa-stop-circle text-danger me-1"></i>
+                            @Model.HoraFim.ToString("HH:mm")
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Status</label>
+                        <div>
+                            @if (Model.Ativo)
+                            {
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check-circle me-1"></i>Ativo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger fs-6">
+                                    <i class="fas fa-times-circle me-1"></i>Inativo
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Duração</label>
+                        <div class="fw-bold">
+                            <i class="fas fa-hourglass-half text-warning me-1"></i>
+                            @Model.HorarioFormatado
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumo visual -->
+                <div class="alert alert-light mt-3">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-calendar-check me-1"></i>Resumo
+                    </h6>
+                    <p class="mb-0">
+                        <strong>@(Model.PrestadorNome ?? "Prestador")</strong> estará disponível nas 
+                        <strong>@Model.DiaSemanaTexto.ToLower()</strong> das 
+                        <strong>@Model.HoraInicio.ToString("HH:mm")</strong> às 
+                        <strong>@Model.HoraFim.ToString("HH:mm")</strong>
+                        @if (!Model.Ativo)
+                        {
+                            <span class="text-danger">(Horário atualmente inativo)</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Informações de sistema -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Informações do Sistema
+                </h6>
+            </div>
+            <div class="card-body">
+                @if (Model.DataCriacao.HasValue)
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Data de Criação</label>
+                        <div class="small">
+                            <i class="fas fa-calendar me-1"></i>
+                            @Model.DataCriacao.Value.ToString("dd/MM/yyyy")
+                        </div>
+                        <div class="small text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            @Model.DataCriacao.Value.ToString("HH:mm")
+                        </div>
+                    </div>
+                }
+                
+                <div class="mb-3">
+                    <label class="form-label text-muted small">ID do Horário</label>
+                    <div class="small font-monospace">
+                        @Model.Id
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-muted small">ID do Prestador</label>
+                    <div class="small font-monospace">
+                        @Model.PrestadorId
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ações rápidas -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-bolt"></i> Ações Rápidas
+                </h6>
+            </div>
+            <div class="card-body d-grid gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Editar Horário
+                </a>
+                
+                @if (Model.Ativo)
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                        <i class="fas fa-pause me-1"></i> Desativar
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-outline-success" onclick="ativarHorario()">
+                        <i class="fas fa-play me-1"></i> Ativar
+                    </button>
+                }
+                
+                <a asp-action="Create" class="btn btn-outline-info">
+                    <i class="fas fa-plus me-1"></i> Criar Novo
+                </a>
+                
+                <a asp-action="CreateMultiple" class="btn btn-outline-success">
+                    <i class="fas fa-calendar-plus me-1"></i> Múltiplos
+                </a>
+            </div>
+        </div>
+        
+        <!-- Dicas -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb"></i> Dicas
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>Horários ativos aparecem na agenda pública</li>
+                    <li>Clique em "Editar" para modificar este horário</li>
+                    <li>Use "Múltiplos" para criar horários similares</li>
+                    @if (!Model.Ativo)
+                    {
+                        <li class="text-warning">Este horário está inativo e não será exibido</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function ativarHorario() {
+            if (confirm('Deseja ativar este horário?')) {
+                // Aqui você pode implementar a ativação via AJAX
+                // Por enquanto, redirecionamos para edição
+                window.location.href = '@Url.Action("Edit", new { id = Model.Id })';
+            }
+        }
+    </script>
+} 

@@ -1,0 +1,145 @@
+@model HorarioDisponivelViewModel
+@{
+    ViewData["Title"] = "Novo Horário Disponível";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus-circle"></i> Novo Horário Disponível</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar à Lista
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock"></i> Informações do Horário
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="createForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PrestadorId" class="form-label required">Prestador</label>
+                            <select asp-for="PrestadorId" class="form-select" asp-items="@(ViewBag.Prestadores as SelectList)">
+                                <option value="">Selecione um prestador</option>
+                            </select>
+                            <span asp-validation-for="PrestadorId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DiaSemana" class="form-label required">Dia da Semana</label>
+                            <select asp-for="DiaSemana" class="form-select" asp-items="@(ViewBag.DiasSemana as SelectList)">
+                                <option value="">Selecione um dia</option>
+                            </select>
+                            <span asp-validation-for="DiaSemana" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HoraInicio" class="form-label required">Hora de Início</label>
+                            <input asp-for="HoraInicio" type="time" class="form-control" />
+                            <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                            <div class="form-text">Horário de início do atendimento</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="HoraFim" class="form-label required">Hora de Fim</label>
+                            <input asp-for="HoraFim" type="time" class="form-control" />
+                            <span asp-validation-for="HoraFim" class="text-danger"></span>
+                            <div class="form-text">Horário de fim do atendimento</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input asp-for="Ativo" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Ativo" class="form-check-label">
+                                Horário ativo
+                            </label>
+                            <div class="form-text">Marque para que o horário fique disponível imediatamente</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview do horário -->
+                    <div class="alert alert-info" id="horarioPreview" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Preview:</strong> <span id="previewText"></span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Criar Horário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Card de dicas -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Dicas</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Certifique-se de que não há conflito com outros horários do mesmo prestador no mesmo dia</li>
+                    <li>O horário de fim deve ser posterior ao horário de início</li>
+                    <li>Para criar múltiplos horários de uma vez, use a opção "Múltiplos Horários"</li>
+                    <li>Horários inativos não aparecerão na agenda pública</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Atualizar preview quando os campos mudarem
+            function updatePreview() {
+                const prestador = $('#PrestadorId option:selected').text();
+                const diaSemana = $('#DiaSemana option:selected').text();
+                const horaInicio = $('#HoraInicio').val();
+                const horaFim = $('#HoraFim').val();
+                
+                if (prestador && prestador !== 'Selecione um prestador' && 
+                    diaSemana && diaSemana !== 'Selecione um dia' &&
+                    horaInicio && horaFim) {
+                    
+                    $('#previewText').text(`${prestador} - ${diaSemana} de ${horaInicio} às ${horaFim}`);
+                    $('#horarioPreview').show();
+                } else {
+                    $('#horarioPreview').hide();
+                }
+            }
+            
+            $('#PrestadorId, #DiaSemana, #HoraInicio, #HoraFim').on('change', updatePreview);
+            
+            // Validação do lado cliente
+            $('#createForm').submit(function(e) {
+                const horaInicio = $('#HoraInicio').val();
+                const horaFim = $('#HoraFim').val();
+                
+                if (horaInicio && horaFim && horaInicio >= horaFim) {
+                    e.preventDefault();
+                    alert('A hora de fim deve ser posterior à hora de início!');
+                    return false;
+                }
+            });
+            
+            // Inicializar preview se já houver dados
+            updatePreview();
+        });
+    </script>
+} 

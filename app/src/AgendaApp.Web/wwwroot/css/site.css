@@ -1,0 +1,309 @@
+/* AgendaApp - Estilos principais */
+
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+  --info-color: #0dcaf0;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+  --border-radius: 8px;
+  --box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin-bottom: 60px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+/* Melhorias de acessibilidade e foco */
+.btn:focus, 
+.btn:active:focus, 
+.btn-link.nav-link:focus, 
+.form-control:focus, 
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primary-color);
+}
+
+/* Layout principal */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+  background-color: var(--light-color);
+  border-top: 1px solid #dee2e6;
+}
+
+/* Navegação */
+.navbar-brand {
+  font-weight: bold;
+  color: var(--primary-color) !important;
+  font-size: 1.5rem;
+  transition: var(--transition);
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+}
+
+.nav-link {
+  transition: var(--transition);
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.1);
+  transform: translateY(-1px);
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
+}
+
+.dropdown-item {
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateX(5px);
+}
+
+/* Cards e containers */
+.card {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 1.5rem;
+  border: none;
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary-color), #4285f4);
+  color: white;
+  border-bottom: none;
+  font-weight: 600;
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Listas */
+.list-group-item {
+  border: none;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: var(--transition);
+}
+
+.list-group-item:hover {
+  background-color: var(--light-color);
+  padding-left: 0.5rem;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* Tipografia */
+.text-center h1 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+  position: relative;
+}
+
+.text-center h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+  border-radius: 2px;
+}
+
+h2, h3, h4, h5, h6 {
+  color: var(--dark-color);
+  font-weight: 500;
+}
+
+/* Botões customizados */
+.btn {
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: var(--transition);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), #4285f4);
+  border: none;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), #28a745);
+  border: none;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger-color), #e74c3c);
+  border: none;
+}
+
+/* Formulários */
+.form-control {
+  border-radius: var(--border-radius);
+  border: 1px solid #ddd;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--dark-color);
+  margin-bottom: 0.5rem;
+}
+
+/* Badges */
+.badge {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+/* Alertas */
+.alert {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: var(--box-shadow);
+}
+
+/* Tabelas */
+.table {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.table thead th {
+  background: linear-gradient(135deg, var(--primary-color), #4285f4);
+  color: white;
+  border: none;
+  font-weight: 500;
+}
+
+.table tbody tr {
+  transition: var(--transition);
+}
+
+.table tbody tr:hover {
+  background-color: var(--light-color);
+  transform: scale(1.01);
+}
+
+/* Responsividade melhorada */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .btn {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Loading spinner */
+.spinner-border-custom {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.1em;
+}
+
+/* Animações */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Utilitários */
+.text-primary-custom {
+  color: var(--primary-color) !important;
+}
+
+.bg-primary-custom {
+  background: linear-gradient(135deg, var(--primary-color), #4285f4) !important;
+}
+
+.border-primary-custom {
+  border-color: var(--primary-color) !important;
+} 

@@ -1,0 +1,68 @@
+@model AgendaApp.Web.ViewModels.PrestadorViewModel
+@{
+    ViewData["Title"] = "Excluir Prestador";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-trash"></i>
+                        Confirmar Exclusão
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+
+                    <p class="lead">Tem certeza que deseja excluir o prestador abaixo?</p>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">@Model.Nome</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="card-text">
+                                        <strong>Área:</strong> @Model.AreaAtuacao<br>
+                                        <strong>E-mail:</strong> @Model.Email<br>
+                                        <strong>Telefone:</strong> @Model.Telefone
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    @if (!string.IsNullOrEmpty(Model.CNPJ))
+                                    {
+                                        <p class="card-text">
+                                            <strong>CNPJ:</strong> <code>@Model.CNPJ</code>
+                                        </p>
+                                    }
+                                    @if (Model.DataCriacao.HasValue)
+                                    {
+                                        <p class="card-text">
+                                            <strong>Criado em:</strong> @Model.DataCriacao.Value.ToString("dd/MM/yyyy")
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

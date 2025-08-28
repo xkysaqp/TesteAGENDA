@@ -1,0 +1,99 @@
+@model AgendaApp.Web.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login - AgendaApp";
+    Layout = "_Layout";
+}
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                        <h2 class="h4 mb-0">AgendaApp</h2>
+                        <p class="mb-0 opacity-75">Faça login em sua conta</p>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (TempData["InfoMessage"] != null)
+                        {
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                @TempData["InfoMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form asp-action="Login" asp-controller="Account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="fas fa-envelope text-muted me-2"></i>@Html.DisplayNameFor(m => m.Email)
+                                </label>
+                                <input asp-for="Email" class="form-control form-control-lg" placeholder="seu@email.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">
+                                    <i class="fas fa-lock text-muted me-2"></i>@Html.DisplayNameFor(m => m.Password)
+                                </label>
+                                <input asp-for="Password" class="form-control form-control-lg" placeholder="Digite sua senha" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input asp-for="RememberMe" class="form-check-input" />
+                                <label asp-for="RememberMe" class="form-check-label">
+                                    @Html.DisplayNameFor(m => m.RememberMe)
+                                </label>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center py-3 bg-light">
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i>
+                            Sistema Multitenant de Agendamentos
+                        </small>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <div class="card border-0 bg-transparent">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Credenciais de Teste
+                            </h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="border rounded p-3 mb-2">
+                                        <strong class="text-primary">Admin</strong><br>
+                                        <small class="text-muted">admin@agendaapp.com</small><br>
+                                        <small class="text-muted">Admin123!</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-3 mb-2">
+                                        <strong class="text-success">Loja</strong><br>
+                                        <small class="text-muted">usuario@lojateste.com</small><br>
+                                        <small class="text-muted">Usuario123!</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+} 

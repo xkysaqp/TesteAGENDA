@@ -1,0 +1,1845 @@
+@model AgendaApp.Web.ViewModels.PrestadorViewModel
+@{
+    ViewData["Title"] = "Novo Prestador";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Novo Prestador
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Prestador" method="post" id="formPrestador">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Campos hidden para os serviços -->
+                        <div id="servicosHidden"></div>
+
+                        <!-- Campo Loja (condicional baseado na role) -->
+                        @if (ViewBag.IsAdmin == true)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="LojaId" class="form-label">
+                                    <i class="fas fa-store me-2"></i>@Html.DisplayNameFor(m => m.LojaId) <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="LojaId" asp-items="@ViewBag.Lojas" class="form-select">
+                                    <option value="">Selecione uma loja...</option>
+                                </select>
+                                <span asp-validation-for="LojaId" class="text-danger"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-store me-2"></i>Loja
+                                </label>
+                                <input type="text" class="form-control" value="@ViewBag.LojaNome" readonly />
+                                <input asp-for="LojaId" type="hidden" />
+                                <div class="form-text">Prestador será vinculado à sua loja</div>
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label">
+                                        <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(m => m.Nome) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Nome completo do prestador" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="AreaAtuacao" class="form-label">
+                                        <i class="fas fa-briefcase me-2"></i>@Html.DisplayNameFor(m => m.AreaAtuacao) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="AreaAtuacao" class="form-control" placeholder="Ex: Medicina, Advocacia..." />
+                                    <span asp-validation-for="AreaAtuacao" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>@Html.DisplayNameFor(m => m.Email) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Email" class="form-control" placeholder="email@exemplo.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Telefone" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>@Html.DisplayNameFor(m => m.Telefone) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Telefone" class="form-control" placeholder="(11) 99999-9999" />
+                                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CNPJ" class="form-label">
+                                <i class="fas fa-id-card me-2"></i>@Html.DisplayNameFor(m => m.CNPJ)
+                            </label>
+                            <input asp-for="CNPJ" class="form-control" placeholder="00.000.000/0000-00 (opcional)" />
+                            <span asp-validation-for="CNPJ" class="text-danger"></span>
+                            <div class="form-text">Campo opcional - preencha se o prestador for pessoa jurídica</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Prestador" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Salvar Prestador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Seções de Serviços Reorganizada -->
+            <!-- Serviços Específicos -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cogs me-2"></i>Serviços Específicos (<span id="servicosEspecificosCount">0</span>)
+                    </h6>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#selecionarServicoModal">
+                            <i class="fas fa-list fa-sm me-1"></i>Selecionar serviço
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#adicionarServicoModal">
+                            <i class="fas fa-plus fa-sm me-1"></i>Novo Serviço
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="servicosEspecificosContainer">
+                        <div class="text-center py-4" id="emptyServicosEspecificosMessage">
+                            <i class="fas fa-user-cog fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhum serviço específico criado ainda.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adicionarServicoModal">
+                                <i class="fas fa-plus me-2"></i>Criar Primeiro Serviço
+                            </button>
+                        </div>
+                        <div id="servicosEspecificosList" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Serviços Globais Vinculados -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-link me-2"></i>Serviços Globais (<span id="servicosVinculadosCount">0</span>)
+                    </h6>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#vincularServicoModal">
+                        <i class="fas fa-link fa-sm me-1"></i>Vincular Serviço
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="servicosVinculadosContainer">
+                        <div class="text-center py-4" id="emptyServicosVinculadosMessage">
+                            <i class="fas fa-link fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhum serviço global vinculado ainda.</p>
+                            <p class="text-muted small">Vincule serviços globais da loja para oferecê-los com valores personalizados.</p>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#vincularServicoModal">
+                                <i class="fas fa-link me-2"></i>Vincular Primeiro Serviço
+                            </button>
+                        </div>
+                        <div id="servicosVinculadosList" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horários Disponíveis -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-clock me-2"></i>Horários Disponíveis (<span id="horariosCount">0</span>)
+                    </h6>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#adicionarHorarioModal">
+                            <i class="fas fa-plus fa-sm me-1"></i>Adicionar Horário
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#adicionarHorariosEmLoteModal">
+                            <i class="fas fa-calendar-plus fa-sm me-1"></i>Horários em Lote
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="horariosContainer">
+                        <div class="text-center py-4" id="emptyHorariosMessage">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhum horário disponível cadastrado ainda.</p>
+                            <p class="text-muted small">Defina os horários em que o prestador estará disponível para atendimento.</p>
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#adicionarHorarioModal">
+                                <i class="fas fa-plus me-2"></i>Adicionar Primeiro Horário
+                            </button>
+                        </div>
+                        <div id="horariosList" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Selecionar Serviço -->
+<div class="modal fade" id="selecionarServicoModal" tabindex="-1" aria-labelledby="selecionarServicoModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="selecionarServicoModalLabel">
+                    <i class="fas fa-list me-2"></i>Selecionar Serviços Disponíveis
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="filtroServicos" 
+                                placeholder="Buscar serviços...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnRecarregarServicos">
+                            <i class="fas fa-sync-alt me-1"></i>Recarregar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loadingServicos" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Carregando serviços disponíveis...</p>
+                </div>
+
+                <div id="listaServicos" class="row g-3">
+                    <!-- Serviços serão carregados aqui via AJAX -->
+                </div>
+
+                <div id="semServicos" class="text-center py-4" style="display: none;">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Nenhum serviço disponível para vinculação.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Serviço Específico -->
+<div class="modal fade" id="adicionarServicoModal" tabindex="-1" aria-labelledby="adicionarServicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="adicionarServicoModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Criar Novo Serviço Específico
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAdicionarServico">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="Nome" id="servicoNome" placeholder="Nome do Serviço" required>
+                                <label for="servicoNome">Nome do Serviço</label>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="Valor" id="servicoValor" placeholder="Valor" required pattern="^[0-9]+([,\.][0-9]{1,2})?$">
+                                <label for="servicoValor">Valor (R$)</label>
+                                <div class="invalid-feedback">Digite um valor válido (ex: 32,50)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" name="Descricao" id="servicoDescricao" placeholder="Descrição" style="height: 100px" required></textarea>
+                                <label for="servicoDescricao">Descrição</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" name="DuracaoEmMinutos" id="servicoDuracao" min="1" placeholder="Duração" required>
+                                <label for="servicoDuracao">Duração (minutos)</label>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="Ativo" id="servicoAtivo" checked>
+                                <label class="form-check-label" for="servicoAtivo">
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Serviço Ativo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Adicionar Serviço
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vincular Serviço Global -->
+<div class="modal fade" id="vincularServicoModal" tabindex="-1" aria-labelledby="vincularServicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="vincularServicoModalLabel">
+                    <i class="fas fa-link me-2"></i>Vincular Serviço Global
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loading-servicos-globais-create" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando serviços disponíveis...</p>
+                </div>
+                
+                <div id="lista-servicos-globais-create">
+                    <!-- Lista será carregada via JavaScript -->
+                </div>
+                
+                <div id="no-servicos-globais-create" class="text-center py-4" style="display: none;">
+                    <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Não há serviços globais disponíveis para vincular.</p>
+                    <p class="text-muted small">Todos os serviços globais da loja já estão selecionados.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Personalizar Serviço Vinculado -->
+<div class="modal fade" id="personalizarServicoModal" tabindex="-1" aria-labelledby="personalizarServicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="personalizarServicoModalLabel">
+                    <i class="fas fa-edit me-2"></i>Personalizar Serviço Global
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formPersonalizarServico">
+                <div class="modal-body">
+                    <input type="hidden" id="servicoVinculadoIndex" name="servicoVinculadoIndex">
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Serviço:</strong> <span id="servicoNomePersonalizacao"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Valor Padrão</label>
+                                <input type="text" id="valorPadraoPersonalizacao" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Duração Padrão</label>
+                                <input type="text" id="duracaoPadraoPersonalizacao" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="valorPersonalizadoCreate" class="form-label">
+                                    Valor Personalizado <small class="text-muted">(opcional)</small>
+                                </label>
+                                <input type="text" id="valorPersonalizadoCreate" name="valorPersonalizado" class="form-control" 
+                                       pattern="^[0-9]+([,\.][0-9]{1,2})?$" placeholder="Ex: 50,00">
+                                <div class="form-text">Deixe vazio para usar o valor padrão</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="duracaoPersonalizadaCreate" class="form-label">
+                                    Duração Personalizada <small class="text-muted">(opcional)</small>
+                                </label>
+                                <input type="number" id="duracaoPersonalizadaCreate" name="duracaoPersonalizada" class="form-control" 
+                                       min="15" max="1440" placeholder="Ex: 60">
+                                <div class="form-text">Deixe vazio para usar a duração padrão (em minutos)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-2"></i>Salvar Personalização
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Horário Individual -->
+<div class="modal fade" id="adicionarHorarioModal" tabindex="-1" aria-labelledby="adicionarHorarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="adicionarHorarioModalLabel">
+                    <i class="fas fa-clock me-2"></i>Adicionar Horário Disponível
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAdicionarHorario">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="horarioDiaSemana" class="form-label">
+                                    <i class="fas fa-calendar me-2"></i>Dia da Semana <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="horarioDiaSemana" name="DiaSemana" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="1">Segunda-feira</option>
+                                    <option value="2">Terça-feira</option>
+                                    <option value="3">Quarta-feira</option>
+                                    <option value="4">Quinta-feira</option>
+                                    <option value="5">Sexta-feira</option>
+                                    <option value="6">Sábado</option>
+                                    <option value="0">Domingo</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="horarioAtivo" class="form-label">
+                                    <i class="fas fa-toggle-on me-2"></i>Status
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="horarioAtivo" name="Ativo" checked>
+                                    <label class="form-check-label" for="horarioAtivo">
+                                        Horário Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="horarioHoraInicio" class="form-label">
+                                    <i class="fas fa-sun me-2"></i>Hora de Início <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="horarioHoraInicio" name="HoraInicio" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="horarioHoraFim" class="form-label">
+                                    <i class="fas fa-moon me-2"></i>Hora de Fim <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control" id="horarioHoraFim" name="HoraFim" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Dica:</strong> O sistema validará automaticamente se há conflitos com outros horários já cadastrados.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-2"></i>Adicionar Horário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Horários em Lote -->
+<div class="modal fade" id="adicionarHorariosEmLoteModal" tabindex="-1" aria-labelledby="adicionarHorariosEmLoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="adicionarHorariosEmLoteModalLabel">
+                    <i class="fas fa-calendar-plus me-2"></i>Adicionar Horários em Lote
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formAdicionarHorariosEmLote">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-clock me-2"></i>Horário Padrão
+                                </label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="time" class="form-control" id="horarioLoteHoraInicio" value="08:00">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="time" class="form-control" id="horarioLoteHoraFim" value="18:00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar me-2"></i>Dias da Semana
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="segunda" value="1" checked>
+                                    <label class="form-check-label" for="segunda">Segunda</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terca" value="2" checked>
+                                    <label class="form-check-label" for="terca">Terça</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="quarta" value="3" checked>
+                                    <label class="form-check-label" for="quarta">Quarta</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="quinta" value="4" checked>
+                                    <label class="form-check-label" for="quinta">Quinta</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sexta" value="5" checked>
+                                    <label class="form-check-label" for="sexta">Sexta</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sabado" value="6">
+                                    <label class="form-check-label" for="sabado">Sábado</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="domingo" value="0">
+                                    <label class="form-check-label" for="domingo">Domingo</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atenção:</strong> Esta ação criará múltiplos horários de uma vez. Verifique se não há conflitos com horários existentes.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-calendar-plus me-2"></i>Criar Horários em Lote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        // Arrays para armazenar os serviços temporariamente
+        let servicosEspecificos = [];
+        let servicosVinculados = [];
+        let servicoIdCounter = 1;
+        let servicosGlobaisDisponiveis = [];
+
+        // Arrays para armazenar os horários temporariamente
+        let horariosDisponiveis = [];
+        let horarioIdCounter = 1;
+
+        // Máscara para telefone e CNPJ
+        $(document).ready(function() {
+            $('#Telefone').mask('(00) 00000-0000');
+            $('#CNPJ').mask('00.000.000/0000-00');
+
+
+            // Carregar serviços globais quando abrir modal
+            document.getElementById('vincularServicoModal').addEventListener('show.bs.modal', function() {
+                carregarServicosGlobaisDisponiveis();
+            });
+
+            // Form para adicionar serviço específico
+            $('#formAdicionarServico').on("submit", function(e) {
+                e.preventDefault();
+                adicionarServicoEspecifico();
+            });
+
+            // Form para personalizar serviço vinculado
+            $('#formPersonalizarServico').on("submit", function(e) {
+                e.preventDefault();
+                salvarPersonalizacaoServico();
+            });
+
+            // Form para adicionar horário individual
+            $('#formAdicionarHorario').on("submit", function(e) {
+                e.preventDefault();
+                adicionarHorarioIndividual();
+            });
+
+            // Form para adicionar horários em lote
+            $('#formAdicionarHorariosEmLote').on("submit", function(e) {
+                e.preventDefault();
+                adicionarHorariosEmLote();
+            });
+
+        });
+
+        // ===============================================
+        // FUNCIONALIDADES DOS SERVIÇOS ESPECÍFICOS
+        // ===============================================
+        
+        function adicionarServicoEspecifico() {
+            const nome = document.getElementById('servicoNome').value.trim();
+            const valorInput = document.getElementById('servicoValor').value;
+            const valor = parseFloat(valorInput.replace(',', '.'));
+            const duracao = parseInt(document.getElementById('servicoDuracao').value);
+            const descricao = document.getElementById('servicoDescricao').value.trim();
+            const ativo = document.getElementById('servicoAtivo').checked;
+
+            // Limpar erros anteriores
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            let hasError = false;
+
+            if (!nome || nome.length < 2) {
+                showFieldError('servicoNome', 'Nome deve ter pelo menos 2 caracteres');
+                hasError = true;
+            }
+
+            if (!valor || valor < 0.01) {
+                showFieldError('servicoValor', 'Valor deve ser maior que R$ 0,01');
+                hasError = true;
+            }
+
+            if (!duracao || duracao < 1) {
+                showFieldError('servicoDuracao', 'Duração deve ser de pelo menos 1 minuto');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Verificar se já existe serviço com o mesmo nome
+            if (servicosEspecificos.some(s => s.nome.toLowerCase() === nome.toLowerCase())) {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Já existe um serviço específico com este nome.',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // Adicionar serviço à lista temporária
+            const novoServico = {
+                id: servicoIdCounter++,
+                nome: nome,
+                descricao: descricao,
+                valor: valor,
+                duracaoEmMinutos: duracao,
+                ativo: ativo
+            };
+
+            servicosEspecificos.push(novoServico);
+
+            // Atualizar interface
+            atualizarListaServicosEspecificos();
+
+            // Limpar formulário e fechar modal
+            document.getElementById('formAdicionarServico').reset();
+            document.getElementById('servicoAtivo').checked = true;
+            bootstrap.Modal.getInstance(document.getElementById('adicionarServicoModal')).hide();
+
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Serviço específico adicionado à lista.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function atualizarListaServicosEspecificos() {
+            const emptyMessage = document.getElementById('emptyServicosEspecificosMessage');
+            const servicesList = document.getElementById('servicosEspecificosList');
+            const count = document.getElementById('servicosEspecificosCount');
+
+            count.textContent = servicosEspecificos.length;
+
+            if (servicosEspecificos.length === 0) {
+                emptyMessage.style.display = 'block';
+                servicesList.style.display = 'none';
+            } else {
+                emptyMessage.style.display = 'none';
+                servicesList.style.display = 'block';
+
+                let html = '';
+                servicosEspecificos.forEach(servico => {
+                    const valorFormatado = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(servico.valor);
+
+                    const duracaoFormatada = servico.duracaoEmMinutos >= 60
+                        ? `${Math.floor(servico.duracaoEmMinutos / 60)}h ${(servico.duracaoEmMinutos % 60).toString().padStart(2, '0')}min`
+                        : `${servico.duracaoEmMinutos}min`;
+
+                    html += `
+                        <div class="card border-left-primary mb-3" data-servico-id="${servico.id}">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="text-primary mb-1">${servico.nome}</h6>
+                                        <p class="text-muted small mb-2">${servico.descricao || 'Sem descrição'}</p>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span class="badge bg-success">${valorFormatado}</span>
+                                            <span class="badge bg-info">${duracaoFormatada}</span>
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-user me-1"></i>Específico
+                                            </span>
+                                            ${servico.ativo
+                                                ? '<span class="badge bg-success"><i class="fas fa-check fa-sm"></i> Ativo</span>'
+                                                : '<span class="badge bg-danger"><i class="fas fa-times fa-sm"></i> Inativo</span>'
+                                            }
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="removerServicoEspecifico(${servico.id})" title="Remover">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                servicesList.innerHTML = html;
+            }
+        }
+
+        function removerServicoEspecifico(id) {
+            Swal.fire({
+                title: 'Confirmar remoção',
+                text: 'Tem certeza que deseja remover este serviço específico?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sim, remover!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    servicosEspecificos = servicosEspecificos.filter(s => s.id !== id);
+                    atualizarListaServicosEspecificos();
+
+                    Swal.fire({
+                        title: 'Removido!',
+                        text: 'Serviço específico removido da lista.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // ===============================================
+        // FUNCIONALIDADES DOS SERVIÇOS VINCULADOS
+        // ===============================================
+
+        async function carregarServicosGlobaisDisponiveis() {
+            const loadingElement = document.getElementById('loading-servicos-globais-create');
+            const listaElement = document.getElementById('lista-servicos-globais-create');
+            const noServicosElement = document.getElementById('no-servicos-globais-create');
+
+            // Mostrar loading
+            loadingElement.style.display = 'block';
+            listaElement.innerHTML = '';
+            noServicosElement.style.display = 'none';
+
+            try {
+                const response = await fetch('@Url.Action("ObterServicosGlobaisDisponiveis", "Prestador")');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        servicosGlobaisDisponiveis = result.data || [];
+                        renderizarServicosGlobaisDisponiveis();
+                    } else {
+                        mostrarErro('Erro ao carregar serviços: ' + result.message);
+                    }
+                } else {
+                    mostrarErro('Erro ao carregar serviços disponíveis');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar serviços globais:', error);
+                mostrarErro('Erro de conexão');
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        function renderizarServicosGlobaisDisponiveis() {
+            const listaElement = document.getElementById('lista-servicos-globais-create');
+            const noServicosElement = document.getElementById('no-servicos-globais-create');
+
+            // Filtrar serviços já vinculados
+            const servicosJaVinculados = servicosVinculados.map(s => s.servicoId);
+            const servicosDisponiveis = servicosGlobaisDisponiveis.filter(s => !servicosJaVinculados.includes(s.id));
+
+            if (servicosDisponiveis.length === 0) {
+                noServicosElement.style.display = 'block';
+                return;
+            }
+
+            const html = servicosDisponiveis.map(servico => `
+                <div class="card mb-3 border-success">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 text-success">${servico.nome}</h6>
+                                <p class="text-muted small mb-2">${servico.descricao}</p>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-success">R$ ${servico.valorFormatado}</span>
+                                    <span class="badge bg-info">${servico.duracaoFormatada}</span>
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-globe me-1"></i>Global
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="btn btn-success btn-sm" onclick="vincularServicoGlobal('${servico.id}', '${servico.nome}')">
+                                <i class="fas fa-link me-1"></i>Vincular
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            listaElement.innerHTML = html;
+        }
+
+        function vincularServicoGlobal(servicoId, servicoNome) {
+            const servico = servicosGlobaisDisponiveis.find(s => s.id === servicoId);
+            if (!servico) return;
+
+            const novoVinculo = {
+                id: servicoIdCounter++,
+                servicoId: servicoId,
+                servicoNome: servico.nome,
+                servicoDescricao: servico.descricao,
+                valorPadrao: servico.valor,
+                duracaoPadraoEmMinutos: servico.duracaoEmMinutos,
+                valorPersonalizado: null,
+                duracaoPersonalizadaEmMinutos: null
+            };
+
+            servicosVinculados.push(novoVinculo);
+
+            // Atualizar listas
+            atualizarListaServicosVinculados();
+            renderizarServicosGlobaisDisponiveis();
+
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('vincularServicoModal'));
+            modal.hide();
+
+            Swal.fire({
+                title: 'Sucesso!',
+                text: `Serviço "${servicoNome}" vinculado com sucesso!`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        function atualizarListaServicosVinculados() {
+            const emptyMessage = document.getElementById('emptyServicosVinculadosMessage');
+            const servicesList = document.getElementById('servicosVinculadosList');
+            const count = document.getElementById('servicosVinculadosCount');
+
+            count.textContent = servicosVinculados.length;
+
+            if (servicosVinculados.length === 0) {
+                emptyMessage.style.display = 'block';
+                servicesList.style.display = 'none';
+            } else {
+                emptyMessage.style.display = 'none';
+                servicesList.style.display = 'block';
+
+                let html = '';
+                servicosVinculados.forEach((vinculo, index) => {
+                    const valorEfetivo = vinculo.valorPersonalizado || vinculo.valorPadrao;
+                    const duracaoEfetiva = vinculo.duracaoPersonalizadaEmMinutos || vinculo.duracaoPadraoEmMinutos;
+                    
+                    const valorFormatado = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(valorEfetivo);
+
+                    const duracaoFormatada = duracaoEfetiva >= 60
+                        ? `${Math.floor(duracaoEfetiva / 60)}h ${(duracaoEfetiva % 60).toString().padStart(2, '0')}min`
+                        : `${duracaoEfetiva}min`;
+
+                    const temPersonalizacao = vinculo.valorPersonalizado || vinculo.duracaoPersonalizadaEmMinutos;
+
+                    html += `
+                        <div class="card border-left-info mb-3" data-vinculo-id="${vinculo.id}">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="text-info mb-1">${vinculo.servicoNome}</h6>
+                                        <p class="text-muted small mb-2">${vinculo.servicoDescricao}</p>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span class="badge bg-success">
+                                                ${valorFormatado}
+                                                ${vinculo.valorPersonalizado ? '<i class="fas fa-star fa-xs ms-1" title="Valor personalizado"></i>' : ''}
+                                            </span>
+                                            <span class="badge bg-info">
+                                                ${duracaoFormatada}
+                                                ${vinculo.duracaoPersonalizadaEmMinutos ? '<i class="fas fa-star fa-xs ms-1" title="Duração personalizada"></i>' : ''}
+                                            </span>
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-globe me-1"></i>Global
+                                            </span>
+                                            ${temPersonalizacao ? '<span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>Personalizado</span>' : ''}
+                                        </div>
+                                        ${temPersonalizacao ? `
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                Padrão: R$ ${vinculo.valorPadrao.toFixed(2).replace('.', ',')} • ${vinculo.duracaoPadraoEmMinutos}min
+                                            </small>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item" onclick="editarServicoVinculado(${index})">
+                                                    <i class="fas fa-edit me-2"></i>Personalizar
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" onclick="removerServicoVinculado(${vinculo.id}, '${vinculo.servicoNome}')">
+                                                    <i class="fas fa-unlink me-2"></i>Desvincular
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                servicesList.innerHTML = html;
+            }
+        }
+
+        function editarServicoVinculado(index) {
+            const vinculo = servicosVinculados[index];
+            if (!vinculo) return;
+
+            // Preencher modal
+            document.getElementById('servicoVinculadoIndex').value = index;
+            document.getElementById('servicoNomePersonalizacao').textContent = vinculo.servicoNome;
+            document.getElementById('valorPadraoPersonalizacao').value = `R$ ${vinculo.valorPadrao.toFixed(2).replace('.', ',')}`;
+            document.getElementById('duracaoPadraoPersonalizacao').value = `${vinculo.duracaoPadraoEmMinutos} minutos`;
+            
+            // Preencher valores personalizados (se existirem)
+            document.getElementById('valorPersonalizadoCreate').value = vinculo.valorPersonalizado ? 
+                vinculo.valorPersonalizado.toFixed(2).replace('.', ',') : '';
+            document.getElementById('duracaoPersonalizadaCreate').value = vinculo.duracaoPersonalizadaEmMinutos || '';
+
+            // Abrir modal
+            const modal = new bootstrap.Modal(document.getElementById('personalizarServicoModal'));
+            modal.show();
+        }
+
+        function salvarPersonalizacaoServico() {
+            const index = parseInt(document.getElementById('servicoVinculadoIndex').value);
+            const valorPersonalizadoInput = document.getElementById('valorPersonalizadoCreate').value.trim();
+            const duracaoPersonalizada = document.getElementById('duracaoPersonalizadaCreate').value.trim();
+
+            if (index < 0 || index >= servicosVinculados.length) return;
+
+            // Converter valores
+            const valorPersonalizado = valorPersonalizadoInput ? 
+                parseFloat(valorPersonalizadoInput.replace(',', '.')) : null;
+            const duracaoPersonalizadaNum = duracaoPersonalizada ? 
+                parseInt(duracaoPersonalizada) : null;
+
+            // Validações
+            if (valorPersonalizado && valorPersonalizado < 0.01) {
+                mostrarErro('Valor personalizado deve ser maior que R$ 0,01');
+                return;
+            }
+
+            if (duracaoPersonalizadaNum && duracaoPersonalizadaNum < 15) {
+                mostrarErro('Duração personalizada deve ser de pelo menos 15 minutos');
+                return;
+            }
+
+            // Atualizar vinculo
+            servicosVinculados[index].valorPersonalizado = valorPersonalizado;
+            servicosVinculados[index].duracaoPersonalizadaEmMinutos = duracaoPersonalizadaNum;
+
+            // Atualizar interface
+            atualizarListaServicosVinculados();
+
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('personalizarServicoModal'));
+            modal.hide();
+
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Personalização salva com sucesso!',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        function removerServicoVinculado(id, servicoNome) {
+            Swal.fire({
+                title: 'Confirmar Desvinculação',
+                text: `Tem certeza que deseja desvincular o serviço "${servicoNome}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sim, desvincular',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    servicosVinculados = servicosVinculados.filter(s => s.id !== id);
+                    atualizarListaServicosVinculados();
+                    renderizarServicosGlobaisDisponiveis(); // Recarregar lista de disponíveis
+
+                    Swal.fire({
+                        title: 'Desvinculado!',
+                        text: 'Serviço desvinculado com sucesso.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // ===============================================
+        // FUNCIONALIDADES DOS HORÁRIOS DISPONÍVEIS
+        // ===============================================
+
+        function adicionarHorarioIndividual() {
+            const diaSemana = parseInt(document.getElementById('horarioDiaSemana').value);
+            const horaInicio = document.getElementById('horarioHoraInicio').value;
+            const horaFim = document.getElementById('horarioHoraFim').value;
+            const ativo = document.getElementById('horarioAtivo').checked;
+
+            // Limpar erros anteriores
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            let hasError = false;
+
+            if (!diaSemana && diaSemana !== 0) {
+                showFieldError('horarioDiaSemana', 'Selecione um dia da semana');
+                hasError = true;
+            }
+
+            if (!horaInicio) {
+                showFieldError('horarioHoraInicio', 'Selecione a hora de início');
+                hasError = true;
+            }
+
+            if (!horaFim) {
+                showFieldError('horarioHoraFim', 'Selecione a hora de fim');
+                hasError = true;
+            }
+
+            if (horaInicio >= horaFim) {
+                showFieldError('horarioHoraFim', 'A hora de fim deve ser posterior à hora de início');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Verificar conflitos com horários existentes
+            const conflito = verificarConflitoHorario(diaSemana, horaInicio, horaFim);
+            if (conflito) {
+                Swal.fire({
+                    title: 'Conflito de Horário!',
+                    text: `Existe conflito com o horário: ${conflito.diaSemana} das ${conflito.horaInicio} às ${conflito.horaFim}`,
+                    icon: 'warning'
+                });
+                return;
+            }
+
+            // Adicionar horário à lista temporária
+            const novoHorario = {
+                id: horarioIdCounter++,
+                diaSemana: diaSemana,
+                horaInicio: horaInicio,
+                horaFim: horaFim,
+                ativo: ativo
+            };
+
+            horariosDisponiveis.push(novoHorario);
+
+            // Atualizar interface
+            atualizarListaHorarios();
+
+            // Limpar formulário e fechar modal
+            document.getElementById('formAdicionarHorario').reset();
+            document.getElementById('horarioAtivo').checked = true;
+            bootstrap.Modal.getInstance(document.getElementById('adicionarHorarioModal')).hide();
+
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Horário adicionado à lista.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function adicionarHorariosEmLote() {
+            const horaInicio = document.getElementById('horarioLoteHoraInicio').value;
+            const horaFim = document.getElementById('horarioLoteHoraFim').value;
+            
+            if (!horaInicio || !horaFim) {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Defina o horário padrão (início e fim)',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            if (horaInicio >= horaFim) {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'A hora de fim deve ser posterior à hora de início',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // Obter dias selecionados
+            const diasSelecionados = [];
+            const checkboxes = document.querySelectorAll('#adicionarHorariosEmLoteModal input[type="checkbox"]:checked');
+            
+            if (checkboxes.length === 0) {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Selecione pelo menos um dia da semana',
+                    icon: 'error'
+                });
+                return;
+            }
+
+            checkboxes.forEach(checkbox => {
+                diasSelecionados.push(parseInt(checkbox.value));
+            });
+
+            // Verificar conflitos antes de adicionar
+            const conflitos = [];
+            diasSelecionados.forEach(dia => {
+                const conflito = verificarConflitoHorario(dia, horaInicio, horaFim);
+                if (conflito) {
+                    conflitos.push(conflito);
+                }
+            });
+
+            if (conflitos.length > 0) {
+                const mensagemConflitos = conflitos.map(c => 
+                    `${obterNomeDiaSemana(c.diaSemana)} das ${c.horaInicio} às ${c.horaFim}`
+                ).join('\n');
+
+                Swal.fire({
+                    title: 'Conflitos Detectados!',
+                    text: `Os seguintes horários têm conflitos:\n\n${mensagemConflitos}`,
+                    icon: 'warning',
+                    confirmButtonText: 'Continuar mesmo assim',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        criarHorariosEmLote(diasSelecionados, horaInicio, horaFim);
+                    }
+                });
+                return;
+            }
+
+            criarHorariosEmLote(diasSelecionados, horaInicio, horaFim);
+        }
+
+        function criarHorariosEmLote(dias, horaInicio, horaFim) {
+            let horariosCriados = 0;
+            let conflitosIgnorados = 0;
+
+            dias.forEach(dia => {
+                const conflito = verificarConflitoHorario(dia, horaInicio, horaFim);
+                if (!conflito) {
+                    const novoHorario = {
+                        id: horarioIdCounter++,
+                        diaSemana: dia,
+                        horaInicio: horaInicio,
+                        horaFim: horaFim,
+                        ativo: true
+                    };
+                    horariosDisponiveis.push(novoHorario);
+                    horariosCriados++;
+                } else {
+                    conflitosIgnorados++;
+                }
+            });
+
+            // Atualizar interface
+            atualizarListaHorarios();
+
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('adicionarHorariosEmLoteModal')).hide();
+
+            // Mostrar resultado
+            let mensagem = `Criados ${horariosCriados} horários com sucesso!`;
+            if (conflitosIgnorados > 0) {
+                mensagem += `\n${conflitosIgnorados} horários não foram criados devido a conflitos.`;
+            }
+
+            Swal.fire({
+                title: 'Horários Criados!',
+                text: mensagem,
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        }
+
+        function verificarConflitoHorario(diaSemana, horaInicio, horaFim) {
+            return horariosDisponiveis.find(h => 
+                h.diaSemana === diaSemana &&
+                h.ativo &&
+                ((horaInicio >= h.horaInicio && horaInicio < h.horaFim) ||
+                 (horaFim > h.horaInicio && horaFim <= h.horaFim) ||
+                 (horaInicio <= h.horaInicio && horaFim >= h.horaFim))
+            );
+        }
+
+        function obterNomeDiaSemana(dia) {
+            const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            return dias[dia];
+        }
+
+        function atualizarListaHorarios() {
+            const emptyMessage = document.getElementById('emptyHorariosMessage');
+            const horariosList = document.getElementById('horariosList');
+            const count = document.getElementById('horariosCount');
+
+            count.textContent = horariosDisponiveis.length;
+
+            if (horariosDisponiveis.length === 0) {
+                emptyMessage.style.display = 'block';
+                horariosList.style.display = 'none';
+            } else {
+                emptyMessage.style.display = 'none';
+                horariosList.style.display = 'block';
+
+                let html = '';
+                horariosDisponiveis.forEach(horario => {
+                    const diaNome = obterNomeDiaSemana(horario.diaSemana);
+                    const statusBadge = horario.ativo 
+                        ? '<span class="badge bg-success"><i class="fas fa-check fa-sm"></i> Ativo</span>'
+                        : '<span class="badge bg-danger"><i class="fas fa-times fa-sm"></i> Inativo</span>';
+
+                    html += `
+                        <div class="card border-left-warning mb-3" data-horario-id="${horario.id}">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="text-warning mb-1">
+                                            <i class="fas fa-calendar-day me-2"></i>${diaNome}
+                                        </h6>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-sun me-1"></i>${horario.horaInicio}
+                                            </span>
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-moon me-1"></i>${horario.horaFim}
+                                            </span>
+                                            ${statusBadge}
+                                        </div>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item" onclick="editarHorario(${horario.id})">
+                                                    <i class="fas fa-edit me-2"></i>Editar
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item" onclick="toggleStatusHorario(${horario.id})">
+                                                    <i class="fas fa-toggle-on me-2"></i>${horario.ativo ? 'Desativar' : 'Ativar'}
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" onclick="removerHorario(${horario.id})">
+                                                    <i class="fas fa-trash me-2"></i>Remover
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                horariosList.innerHTML = html;
+            }
+        }
+
+        function editarHorario(id) {
+            const horario = horariosDisponiveis.find(h => h.id === id);
+            if (!horario) return;
+
+            // Preencher modal
+            document.getElementById('horarioDiaSemana').value = horario.diaSemana;
+            document.getElementById('horarioHoraInicio').value = horario.horaInicio;
+            document.getElementById('horarioHoraFim').value = horario.horaFim;
+            document.getElementById('horarioAtivo').checked = horario.ativo;
+
+            // Marcar como edição
+            document.getElementById('adicionarHorarioModal').setAttribute('data-edit-id', id);
+
+            // Abrir modal
+            const modal = new bootstrap.Modal(document.getElementById('adicionarHorarioModal'));
+            modal.show();
+        }
+
+        function toggleStatusHorario(id) {
+            const horario = horariosDisponiveis.find(h => h.id === id);
+            if (!horario) return;
+
+            horario.ativo = !horario.ativo;
+            atualizarListaHorarios();
+
+            const acao = horario.ativo ? 'ativado' : 'desativado';
+            Swal.fire({
+                title: 'Status Alterado!',
+                text: `Horário ${acao} com sucesso.`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function removerHorario(id) {
+            const horario = horariosDisponiveis.find(h => h.id === id);
+            if (!horario) return;
+
+            const diaNome = obterNomeDiaSemana(horario.diaSemana);
+
+            Swal.fire({
+                title: 'Confirmar remoção',
+                text: `Tem certeza que deseja remover o horário de ${diaNome} das ${horario.horaInicio} às ${horario.horaFim}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sim, remover!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    horariosDisponiveis = horariosDisponiveis.filter(h => h.id !== id);
+                    atualizarListaHorarios();
+
+                    Swal.fire({
+                        title: 'Removido!',
+                        text: 'Horário removido da lista.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // ===============================================
+        // FUNÇÕES AUXILIARES
+        // ===============================================
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            field.classList.add('is-invalid');
+            const feedback = field.nextElementSibling.nextElementSibling; // Pula o label
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.textContent = message;
+            }
+        }
+
+        function mostrarErro(mensagem) {
+            Swal.fire({
+                title: 'Erro!',
+                text: mensagem,
+                icon: 'error'
+            });
+        }
+
+        // Limpar formulário quando modal for fechado
+        document.getElementById('adicionarServicoModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('formAdicionarServico').reset();
+            document.getElementById('servicoAtivo').checked = true;
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        });
+
+        // Atualizar envio do formulário principal para incluir serviços
+        document.getElementById('formPrestador').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Limpar campos hidden anteriores
+            document.getElementById('servicosHidden').innerHTML = '';
+            
+            let allInputs = '';
+            
+            // Adicionar serviços específicos
+            servicosEspecificos.forEach((servico, index) => {
+                allInputs += `
+                    <input type="hidden" name="Servicos[${index}].Nome" value="${servico.nome}" />
+                    <input type="hidden" name="Servicos[${index}].Descricao" value="${servico.descricao}" />
+                    <input type="hidden" name="Servicos[${index}].Valor" value="${servico.valor.toString().replace('.', ',')}" />
+                    <input type="hidden" name="Servicos[${index}].DuracaoEmMinutos" value="${servico.duracaoEmMinutos}" />
+                    <input type="hidden" name="Servicos[${index}].Ativo" value="${servico.ativo}" />
+                `;
+            });
+            
+            // Adicionar serviços vinculados
+            servicosVinculados.forEach((vinculo, index) => {
+                allInputs += `
+                    <input type="hidden" name="ServicosVinculados[${index}].ServicoId" value="${vinculo.servicoId}" />
+                    <input type="hidden" name="ServicosVinculados[${index}].ValorPersonalizado" value="${vinculo.valorPersonalizado ? vinculo.valorPersonalizado.toString().replace('.', ',') : ''}" />
+                    <input type="hidden" name="ServicosVinculados[${index}].DuracaoPersonalizadaEmMinutos" value="${vinculo.duracaoPersonalizadaEmMinutos || ''}" />
+                `;
+            });
+            
+            document.getElementById('servicosHidden').innerHTML = allInputs;
+            
+            // Submeter o formulário
+            this.submit();
+        });
+
+                // Permitir apenas números, vírgula e ponto durante a digitação
+        document.getElementById('servicoValor').addEventListener('input', function(e) {
+            // Remove caracteres inválidos enquanto digita
+            let value = e.target.value;
+            let filteredValue = value.replace(/[^\d,\.]/g, '');
+            
+            // Permite apenas uma vírgula ou ponto
+            let commaCount = (filteredValue.match(/,/g) || []).length;
+            let dotCount = (filteredValue.match(/\./g) || []).length;
+            
+            if (commaCount > 1 || dotCount > 1 || (commaCount > 0 && dotCount > 0)) {
+                // Se há múltiplos separadores, manter apenas o primeiro
+                let hasComma = filteredValue.indexOf(',');
+                let hasDot = filteredValue.indexOf('.');
+                
+                if (hasComma >= 0 && hasDot >= 0) {
+                    // Se tem ambos, manter o primeiro encontrado
+                    if (hasComma < hasDot) {
+                        filteredValue = filteredValue.replace(/\./g, '');
+                    } else {
+                        filteredValue = filteredValue.replace(/,/g, '');
+                    }
+                } else if (commaCount > 1) {
+                    // Múltiplas vírgulas
+                    let parts = filteredValue.split(',');
+                    filteredValue = parts[0] + ',' + parts.slice(1).join('');
+                } else if (dotCount > 1) {
+                    // Múltiplos pontos
+                    let parts = filteredValue.split('.');
+                    filteredValue = parts[0] + '.' + parts.slice(1).join('');
+                }
+            }
+            
+            if (value !== filteredValue) {
+                e.target.value = filteredValue;
+            }
+        });
+
+        // Formatação e validação do valor monetário (pt-BR)
+        document.getElementById('servicoValor').addEventListener('blur', function(e) {
+            let inputValue = e.target.value.trim();
+            
+            // Remove espaços e caracteres inválidos (exceto números, vírgula e ponto)
+            inputValue = inputValue.replace(/[^\d,\.]/g, '');
+            
+            // Aceita tanto vírgula quanto ponto como separador decimal
+            let value = parseFloat(inputValue.replace(',', '.'));
+            
+            if (!isNaN(value) && value >= 0) {
+                // Formatar para pt-BR (vírgula como separador)
+                e.target.value = value.toFixed(2).replace('.', ',');
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            } else if (inputValue !== '') {
+                // Se há valor mas é inválido
+                e.target.classList.remove('is-valid');
+                e.target.classList.add('is-invalid');
+            } else {
+                // Campo vazio, remover classes de validação
+                e.target.classList.remove('is-valid', 'is-invalid');
+            }
+        });
+
+        // Integração com o formulário principal do prestador
+        window.servicosEspecificos = servicosEspecificos;
+
+        // Recarregar serviços se houver dados preservados (em caso de erro de validação)
+        @if (ViewBag.ServicosParaRecarregar != null)
+        {
+            <text>
+            try {
+                const servicosPreservados = @Html.Raw(ViewBag.ServicosParaRecarregar);
+                if (servicosPreservados && Array.isArray(servicosPreservados)) {
+                    // Converter formato do C# para o formato JavaScript
+                    servicosEspecificos = servicosPreservados.map(servico => ({
+                        id: servicoIdCounter++,
+                        nome: servico.Nome || servico.nome,
+                        descricao: servico.Descricao || servico.descricao,
+                        valor: parseFloat((servico.Valor?.toString() || servico.valor || '0').replace(',', '.')),
+                        duracaoEmMinutos: parseInt(servico.DuracaoEmMinutos || servico.duracaoEmMinutos || 0),
+                        ativo: (servico.Ativo?.toString().toLowerCase() === 'true') || servico.ativo || true
+                    }));
+                    
+                    // Atualizar contador para próximos serviços
+                    if (servicosEspecificos.length > 0) {
+                        servicoIdCounter = Math.max(...servicosEspecificos.map(s => s.id)) + 1;
+                    }
+                    
+                    // Atualizar interface
+                    atualizarListaServicosEspecificos();
+                }
+            } catch (error) {
+                console.error('Erro ao recarregar serviços preservados:', error);
+            }
+            </text>
+        }
+
+        // Interceptar submit do formulário principal
+        document.getElementById('formPrestador').addEventListener('submit', function(e) {
+            // Atualizar campos hidden com os serviços antes do submit
+            atualizarCamposHiddenServicos();
+            
+            // Debug: verificar se os campos hidden foram criados
+            const hiddenInputs = document.querySelectorAll('#servicosHidden input[type="hidden"]');
+            console.log(`Total de campos hidden criados: ${hiddenInputs.length}`);
+            hiddenInputs.forEach(input => {
+                console.log(`Campo: ${input.name} = ${input.value}`);
+            });
+        });
+
+        function atualizarCamposHiddenServicos() {
+            const container = document.getElementById('servicosHidden');
+            container.innerHTML = ''; // Limpar campos existentes
+
+            // Adicionar serviços específicos
+            servicosEspecificos.forEach((servico, index) => {
+                console.log(`Processando serviço específico ${index}:`, servico);
+                
+                const fields = [
+                    { name: `Servicos[${index}].Nome`, value: servico.nome },
+                    { name: `Servicos[${index}].Descricao`, value: servico.descricao || '' },
+                    { name: `Servicos[${index}].Valor`, value: servico.valor.toFixed(2).replace('.', ',') }, // Formato pt-BR
+                    { name: `Servicos[${index}].DuracaoEmMinutos`, value: servico.duracaoEmMinutos.toString() },
+                    { name: `Servicos[${index}].Ativo`, value: servico.ativo.toString().toLowerCase() }
+                ];
+
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    container.appendChild(input);
+                    console.log(`Criado campo: ${field.name} = ${field.value}`);
+                });
+            });
+
+            // Adicionar serviços vinculados
+            servicosVinculados.forEach((vinculo, index) => {
+                console.log(`Processando serviço vinculado ${index}:`, vinculo);
+                
+                const fields = [
+                    { name: `ServicosVinculados[${index}].ServicoId`, value: vinculo.servicoId },
+                    { name: `ServicosVinculados[${index}].ValorPersonalizado`, value: vinculo.valorPersonalizado ? vinculo.valorPersonalizado.toString().replace('.', ',') : '' },
+                    { name: `ServicosVinculados[${index}].DuracaoPersonalizadaEmMinutos`, value: vinculo.duracaoPersonalizadaEmMinutos || '' }
+                ];
+
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    container.appendChild(input);
+                    console.log(`Criado campo: ${field.name} = ${field.value}`);
+                });
+            });
+
+            // Adicionar horários disponíveis
+            horariosDisponiveis.forEach((horario, index) => {
+                console.log(`Processando horário ${index}:`, horario);
+                
+                const fields = [
+                    { name: `HorariosDisponiveis[${index}].DiaSemana`, value: horario.diaSemana.toString() },
+                    { name: `HorariosDisponiveis[${index}].HoraInicio`, value: horario.horaInicio },
+                    { name: `HorariosDisponiveis[${index}].HoraFim`, value: horario.horaFim },
+                    { name: `HorariosDisponiveis[${index}].Ativo`, value: horario.ativo.toString().toLowerCase() }
+                ];
+
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    container.appendChild(input);
+                    console.log(`Criado campo: ${field.name} = ${field.value}`);
+                });
+            });
+
+            console.log(`${servicosEspecificos.length} serviços específicos, ${servicosVinculados.length} serviços vinculados e ${horariosDisponiveis.length} horários adicionados ao formulário`);
+        }
+
+        // ===== FUNCIONALIDADE DO MODAL DE SELEÇÃO DE SERVIÇOS =====
+        
+        // Carregar serviços quando o modal for aberto
+        document.getElementById('selecionarServicoModal').addEventListener('show.bs.modal', function () {
+            carregarServicosDisponiveis();
+        });
+
+        // Função para carregar serviços disponíveis
+        function carregarServicosDisponiveis() {
+            const loadingDiv = document.getElementById('loadingServicos');
+            const listaDiv = document.getElementById('listaServicos');
+            const semServicosDiv = document.getElementById('semServicos');
+
+            // Mostrar loading
+            loadingDiv.style.display = 'block';
+            listaDiv.style.display = 'none';
+            semServicosDiv.style.display = 'none';
+
+            // Para o Create, não temos prestadorId ainda, então vamos buscar todos os serviços globais
+            fetch('@Url.Action("ObterServicosGlobaisDisponiveis", "Prestador")')
+                .then(response => response.json())
+                .then(data => {
+                    loadingDiv.style.display = 'none';
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        renderizarServicos(data.data);
+                        listaDiv.style.display = 'block';
+                    } else {
+                        semServicosDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar serviços:', error);
+                    loadingDiv.style.display = 'none';
+                    semServicosDiv.style.display = 'block';
+                    
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: 'Erro ao carregar serviços disponíveis.',
+                        icon: 'error'
+                    });
+                });
+        }
+
+        // Função para renderizar os serviços na lista
+        function renderizarServicos(servicos) {
+            const listaDiv = document.getElementById('listaServicos');
+            
+            listaDiv.innerHTML = servicos.map(servico => `
+                <div class="col-md-6 col-lg-4 servico-item" data-nome="${servico.nome.toLowerCase()}">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title text-primary mb-0">${servico.nome}</h6>
+                                <span class="badge bg-success"><i class="fas fa-plus me-1"></i>Disponível</span>
+                            </div>
+                            
+                            <p class="card-text text-muted small mb-3">${servico.descricao || 'Sem descrição'}</p>
+                            
+                            <div class="d-flex gap-2 mb-3">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-dollar-sign me-1"></i>${servico.valorFormatado}
+                                </span>
+                                <span class="badge bg-info">
+                                    <i class="fas fa-clock me-1"></i>${servico.duracaoFormatada}
+                                </span>
+                            </div>
+                            
+                            <div class="text-muted small mb-3">
+                                <i class="fas fa-store me-1"></i>${servico.lojaNome}
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary btn-sm w-100" 
+                                onclick="adicionarServicoDaLista('${servico.id}', '${servico.nome}', '${servico.descricao}', ${servico.valor}, ${servico.duracaoEmMinutos})">
+                                <i class="fas fa-plus me-1"></i>Adicionar à Lista
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função para adicionar serviço da lista ao prestador
+        function adicionarServicoDaLista(servicoId, servicoNome, servicoDescricao, servicoValor, servicoDuracao) {
+            // Verificar se já existe serviço com o mesmo nome
+            if (servicosEspecificos.some(s => s.nome.toLowerCase() === servicoNome.toLowerCase())) {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Já existe um serviço com este nome na lista.',
+                    icon: 'warning'
+                });
+                return;
+            }
+
+            // Adicionar serviço à lista temporária
+            const novoServico = {
+                id: servicoIdCounter++,
+                nome: servicoNome,
+                descricao: servicoDescricao,
+                valor: servicoValor,
+                duracaoEmMinutos: servicoDuracao,
+                ativo: true
+            };
+
+            servicosEspecificos.push(novoServico);
+
+            // Atualizar interface
+            atualizarListaServicosEspecificos();
+
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('selecionarServicoModal')).hide();
+
+            Swal.fire({
+                title: 'Sucesso!',
+                text: `Serviço "${servicoNome}" adicionado à lista.`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        // Filtro de busca em tempo real
+        document.getElementById('filtroServicos').addEventListener('input', function(e) {
+            const filtro = e.target.value.toLowerCase();
+            const servicos = document.querySelectorAll('.servico-item');
+            
+            servicos.forEach(servico => {
+                const nome = servico.getAttribute('data-nome');
+                if (nome.includes(filtro)) {
+                    servico.style.display = 'block';
+                } else {
+                    servico.style.display = 'none';
+                }
+            });
+        });
+
+        // Botão recarregar
+        document.getElementById('btnRecarregarServicos').addEventListener('click', function() {
+            carregarServicosDisponiveis();
+        });
+
+        // Recarregar horários se houver dados preservados (em caso de erro de validação)
+        @if (ViewBag.HorariosParaRecarregar != null)
+        {
+            <text>
+            try {
+                const horariosPreservados = @Html.Raw(ViewBag.HorariosParaRecarregar);
+                if (horariosPreservados && Array.isArray(horariosPreservados)) {
+                    // Converter formato do C# para o formato JavaScript
+                    horariosDisponiveis = horariosPreservados.map(horario => ({
+                        id: horarioIdCounter++,
+                        diaSemana: parseInt(horario.DiaSemana || horario.diaSemana || 0),
+                        horaInicio: horario.HoraInicio || horario.horaInicio || '08:00',
+                        horaFim: horario.HoraFim || horario.horaFim || '18:00',
+                        ativo: (horario.Ativo?.toString().toLowerCase() === 'true') || horario.ativo || true
+                    }));
+                    
+                    // Atualizar contador para próximos horários
+                    if (horariosDisponiveis.length > 0) {
+                        horarioIdCounter = Math.max(...horariosDisponiveis.map(h => h.id)) + 1;
+                    }
+                    
+                    // Atualizar interface
+                    atualizarListaHorarios();
+                }
+            } catch (error) {
+                console.error('Erro ao recarregar horários preservados:', error);
+            }
+            </text>
+        }
+    </script>
+}

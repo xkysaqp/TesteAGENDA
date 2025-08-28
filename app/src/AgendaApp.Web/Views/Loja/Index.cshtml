@@ -1,0 +1,198 @@
+@model IEnumerable<LojaViewModel>
+
+@{
+    ViewData["Title"] = ViewBag.Title ?? "Gerenciar Lojas";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-store me-2"></i>@ViewData["Title"]
+        </h1>
+        <div class="d-none d-lg-inline-block">
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="fas fa-plus fa-sm text-white-50 me-2"></i>Nova Loja
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filtros -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter me-2"></i>Filtros e Relatórios
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <a asp-action="Index" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-list me-1"></i>Todas as Lojas
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-action="LojasVencidas" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Vencidas
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-action="LojasProximasVencimento" class="btn btn-outline-warning btn-sm w-100">
+                        <i class="fas fa-clock me-1"></i>Próx. Vencimento
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a asp-action="Create" class="btn btn-success btn-sm w-100">
+                        <i class="fas fa-plus me-1"></i>Nova Loja
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Lojas -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-table me-2"></i>Lista de Lojas (@Model.Count())
+            </h6>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Slug</th>
+                                <th>CNPJ</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Vencimento</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loja in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-store me-2 text-primary"></i>
+                                            <div>
+                                                <div class="font-weight-bold">@loja.Nome</div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-crown me-1"></i>
+                                                    Plano: @loja.Plano.ObterDescricao() (R$ @loja.Plano.ObterValorMensal().ToString("F2"))
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <code>@loja.Slug</code>
+                                    </td>
+                                    <td>@loja.CNPJ</td>
+                                    <td>
+                                        <a href="mailto:@loja.EmailContato">@loja.EmailContato</a>
+                                        @if (!string.IsNullOrEmpty(loja.TelefoneContato))
+                                        {
+                                            <br><small class="text-muted">@loja.TelefoneContato</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (loja.Ativa)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Ativa
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Inativa
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (loja.DataVencimento.HasValue)
+                                        {
+                                            <div class="@loja.ClasseStatusVencimento">
+                                                <div>@loja.DataVencimento.Value.ToString("dd/MM/yyyy")</div>
+                                                <small>@loja.StatusVencimento</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sem vencimento</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@loja.Id" 
+                                               class="btn btn-info btn-sm" title="Detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@loja.Id" 
+                                               class="btn btn-primary btn-sm" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm btn-delete-ajax" 
+                                                    title="Excluir"
+                                                    data-delete-url="@Url.Action("DeleteAjax", "Loja", new { id = loja.Id })"
+                                                    data-item-name="a loja '@loja.Nome'"
+                                                    data-confirm-message="Tem certeza que deseja excluir a loja '@loja.Nome'?"
+                                                    data-item-details="<strong>CNPJ:</strong> @loja.CNPJ<br><strong>Email:</strong> @loja.EmailContato<br><strong>Status:</strong> @(loja.Ativa ? "Ativa" : "Inativa")">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-store fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma loja encontrada</h5>
+                    <p class="text-muted">Comece criando uma nova loja para o sistema.</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Criar Nova Loja
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json"
+                },
+                "pageLength": 25,
+                "order": [[ 0, "asc" ]]
+            });
+        });
+    </script>
+} 

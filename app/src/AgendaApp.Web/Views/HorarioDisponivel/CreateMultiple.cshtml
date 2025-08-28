@@ -1,0 +1,231 @@
+@model HorarioMultiploViewModel
+@{
+    ViewData["Title"] = "Criar Múltiplos Horários";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-calendar-plus"></i> Criar Múltiplos Horários</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar à Lista
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clone"></i> Criar Horário para Múltiplos Dias
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateMultiple" method="post" id="createMultipleForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="PrestadorId" class="form-label required">Prestador</label>
+                            <select asp-for="PrestadorId" class="form-select" asp-items="@(ViewBag.Prestadores as SelectList)">
+                                <option value="">Selecione um prestador</option>
+                            </select>
+                            <span asp-validation-for="PrestadorId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="HoraInicio" class="form-label required">Hora de Início</label>
+                            <input asp-for="HoraInicio" type="time" class="form-control" />
+                            <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="HoraFim" class="form-label required">Hora de Fim</label>
+                            <input asp-for="HoraFim" type="time" class="form-control" />
+                            <span asp-validation-for="HoraFim" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Seleção dos dias da semana -->
+                    <div class="mb-4">
+                        <label class="form-label required">Dias da Semana</label>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="form-check">
+                                        <input asp-for="Segunda" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Segunda" class="form-check-label">Segunda-feira</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Terca" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Terca" class="form-check-label">Terça-feira</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Quarta" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Quarta" class="form-check-label">Quarta-feira</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Quinta" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Quinta" class="form-check-label">Quinta-feira</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Sexta" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Sexta" class="form-check-label">Sexta-feira</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Sabado" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Sabado" class="form-check-label">Sábado</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input asp-for="Domingo" class="form-check-input" type="checkbox" />
+                                        <label asp-for="Domingo" class="form-check-label">Domingo</label>
+                                    </div>
+                                </div>
+                                <div class="form-text">Selecione pelo menos um dia da semana</div>
+                                <div id="diasError" class="text-danger" style="display: none;">
+                                    Selecione pelo menos um dia da semana
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de seleção rápida -->
+                        <div class="mt-2">
+                            <small class="text-muted">Seleção rápida:</small>
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-2" id="selecionarSemana">
+                                Semana (Seg-Sex)
+                            </button>
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-2" id="selecionarTodos">
+                                Todos os dias
+                            </button>
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-2" id="limparSelecao">
+                                Limpar seleção
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview dos horários que serão criados -->
+                    <div class="alert alert-info" id="horarioPreview" style="display: none;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Horários que serão criados:</strong>
+                        <div id="previewList" class="mt-2"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Criar Horários
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Card de dicas -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-lightbulb"></i> Dicas</h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Use esta funcionalidade para criar rapidamente o mesmo horário em vários dias</li>
+                    <li>Se houver conflito em algum dia, apenas esse dia não será criado</li>
+                    <li>Você receberá um relatório dos horários criados com sucesso e dos conflitos</li>
+                    <li>Para horários diferentes em cada dia, crie individualmente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Seleção rápida
+            $('#selecionarSemana').click(function() {
+                $('#Segunda, #Terca, #Quarta, #Quinta, #Sexta').prop('checked', true);
+                $('#Sabado, #Domingo').prop('checked', false);
+                updatePreview();
+            });
+            
+            $('#selecionarTodos').click(function() {
+                $('.form-check-input[type="checkbox"]').prop('checked', true);
+                updatePreview();
+            });
+            
+            $('#limparSelecao').click(function() {
+                $('.form-check-input[type="checkbox"]').prop('checked', false);
+                updatePreview();
+            });
+            
+            // Atualizar preview quando os campos mudarem
+            function updatePreview() {
+                const prestador = $('#PrestadorId option:selected').text();
+                const horaInicio = $('#HoraInicio').val();
+                const horaFim = $('#HoraFim').val();
+                
+                // Coletar dias selecionados
+                const diasSelecionados = [];
+                if ($('#Segunda').is(':checked')) diasSelecionados.push('Segunda-feira');
+                if ($('#Terca').is(':checked')) diasSelecionados.push('Terça-feira');
+                if ($('#Quarta').is(':checked')) diasSelecionados.push('Quarta-feira');
+                if ($('#Quinta').is(':checked')) diasSelecionados.push('Quinta-feira');
+                if ($('#Sexta').is(':checked')) diasSelecionados.push('Sexta-feira');
+                if ($('#Sabado').is(':checked')) diasSelecionados.push('Sábado');
+                if ($('#Domingo').is(':checked')) diasSelecionados.push('Domingo');
+                
+                if (prestador && prestador !== 'Selecione um prestador' && 
+                    horaInicio && horaFim && diasSelecionados.length > 0) {
+                    
+                    let html = '<div class="row">';
+                    diasSelecionados.forEach(function(dia) {
+                        html += `<div class="col-md-4 mb-1">
+                                    <span class="badge bg-primary me-1">${dia}</span>
+                                    <small>${horaInicio} às ${horaFim}</small>
+                                </div>`;
+                    });
+                    html += '</div>';
+                    html += `<div class="mt-2"><strong>Prestador:</strong> ${prestador}</div>`;
+                    html += `<div><strong>Total:</strong> ${diasSelecionados.length} horário(s)</div>`;
+                    
+                    $('#previewList').html(html);
+                    $('#horarioPreview').show();
+                } else {
+                    $('#horarioPreview').hide();
+                }
+            }
+            
+            $('.form-check-input, #PrestadorId, #HoraInicio, #HoraFim').on('change', updatePreview);
+            
+            // Validação do lado cliente
+            $('#createMultipleForm').submit(function(e) {
+                // Verificar se pelo menos um dia foi selecionado
+                const diasSelecionados = $('.form-check-input[type="checkbox"]:checked').length;
+                if (diasSelecionados === 0) {
+                    e.preventDefault();
+                    $('#diasError').show();
+                    $('html, body').animate({
+                        scrollTop: $('#diasError').offset().top - 100
+                    }, 500);
+                    return false;
+                } else {
+                    $('#diasError').hide();
+                }
+                
+                // Verificar horários
+                const horaInicio = $('#HoraInicio').val();
+                const horaFim = $('#HoraFim').val();
+                
+                if (horaInicio && horaFim && horaInicio >= horaFim) {
+                    e.preventDefault();
+                    alert('A hora de fim deve ser posterior à hora de início!');
+                    return false;
+                }
+            });
+            
+            // Inicializar preview se já houver dados
+            updatePreview();
+        });
+    </script>
+} 

@@ -1,0 +1,154 @@
+@model LojaViewModel
+
+@{
+    ViewData["Title"] = $"Excluir Loja - {Model.Nome}";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-trash me-2 text-danger"></i>Excluir Loja
+        </h1>
+        <a asp-action="Index" class="btn btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-2"></i>Voltar
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4 border-danger">
+                <div class="card-header py-3 bg-danger">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading">Atenção!</h5>
+                                <p class="mb-0">
+                                    Esta ação não pode ser desfeita. Todos os dados relacionados a esta loja serão perdidos permanentemente.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-4">Tem certeza que deseja excluir a loja abaixo?</h5>
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Nome:</strong><br>
+                                        <span class="h6">@Model.Nome</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Slug:</strong><br>
+                                        <code>@Model.Slug</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>CNPJ:</strong><br>
+                                        @Model.CNPJ
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Email:</strong><br>
+                                        @Model.EmailContato
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Status:</strong><br>
+                                        @if (Model.Ativa)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Ativa
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Inativa
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                                @if (Model.DataVencimento.HasValue)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong>Vencimento:</strong><br>
+                                            <span class="@Model.ClasseStatusVencimento">
+                                                @Model.DataVencimento.Value.ToString("dd/MM/yyyy")
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <strong>Plano:</strong><br>
+                                        @Model.Plano.ObterDescricao()
+                                        <small class="text-muted">(R$ @Model.Plano.ObterValorMensal().ToString("F2")/mês)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <form asp-action="Delete" method="post">
+                        <input asp-for="Id" type="hidden">
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-list me-2"></i>Lista de Lojas
+                            </a>
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Digite CONFIRMAR para prosseguir com a exclusão.')">
+                                <i class="fas fa-trash me-2"></i>Excluir Definitivamente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmar exclusão com digitação
+            $('form').on('submit', function(e) {
+                const confirmacao = prompt('Para confirmar a exclusão, digite: CONFIRMAR');
+                if (confirmacao !== 'CONFIRMAR') {
+                    e.preventDefault();
+                    alert('Exclusão cancelada. Texto de confirmação incorreto.');
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+} 
