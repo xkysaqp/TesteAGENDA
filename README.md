@@ -23,7 +23,7 @@ Sistema completo de agendamento para empresas e profissionais autônomos. Organi
 - Filtros e estatísticas
 - Gestão de lojas, prestadores e serviços
 
-## 🛠 Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 - **Backend**: ASP.NET Core 8.0
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
@@ -205,13 +205,8 @@ dotnet test
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-##  Suporte
 
-- **Email**: contato@agendaapp.com
-- **Telefone**: (11) 99999-9999
-- **Documentação**: [Wiki do Projeto](https://github.com/seu-usuario/agendaapp/wiki)
-
-## 🗺 Roadmap
+##  Roadmap
 
 - [ ] Sistema de notificações por email/SMS
 - [ ] Integração com Google Calendar
