@@ -1,29 +1,29 @@
-# 📅 AgendaApp - Sistema de Agendamento Inteligente
+#  AgendaApp - Sistema de Agendamento Inteligente
 
 Sistema completo de agendamento para empresas e profissionais autônomos. Organize horários, gerencie clientes e otimize sua agenda com ferramentas poderosas e intuitivas.
 
-## 🚀 Funcionalidades
+##  Funcionalidades
 
-### ✅ Cadastro de Prestadores
+###  Cadastro de Prestadores
 - Criar novo prestador
 - Vincular atividades/serviços (específicos e globais)
 - Definir horários de atendimento
 - Fluxo único de cadastro com todas as funcionalidades integradas
 
-### ✅ Agendamento pelo Cliente
+###  Agendamento pelo Cliente
 - Link público com slug da loja (`/agendamento/{lojaSlug}`)
 - Link público com ID da loja (`/agendamento/loja/{lojaId}`)
 - Visualização de horários disponíveis
 - Visualização de funcionários disponíveis
 - Agendamento independente pelo cliente
 
-### ✅ Sistema Administrativo
+###  Sistema Administrativo
 - Controle completo de agendamentos
 - Confirmação, cancelamento e conclusão
 - Filtros e estatísticas
 - Gestão de lojas, prestadores e serviços
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠 Tecnologias Utilizadas
 
 - **Backend**: ASP.NET Core 8.0
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
@@ -33,13 +33,13 @@ Sistema completo de agendamento para empresas e profissionais autônomos. Organi
 - **Mapeamento**: AutoMapper
 - **Arquitetura**: Clean Architecture (DDD)
 
-## 📋 Pré-requisitos
+##  Pré-requisitos
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [PostgreSQL](https://www.postgresql.org/download/) (versão 12 ou superior)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) ou [Visual Studio Code](https://code.visualstudio.com/)
 
-## 🔧 Instalação e Configuração
+##  Instalação e Configuração
 
 ### 1. Clone o repositório
 ```bash
@@ -92,7 +92,7 @@ dotnet ef database update
 dotnet run
 ```
 
-## 🌐 Acessando o Sistema
+##  Acessando o Sistema
 
 ### Landing Page
 ```
@@ -110,7 +110,7 @@ http://localhost:5000/agendamento/minha-loja
 http://localhost:5000/agendamento/loja/{ID-DA-LOJA}
 ```
 
-## 📁 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 app/src/
@@ -135,7 +135,7 @@ app/src/
     └── wwwroot/                  # Arquivos estáticos
 ```
 
-## 🔐 Configuração de Autenticação
+##  Configuração de Autenticação
 
 O sistema utiliza ASP.NET Core Identity para autenticação. Para criar um usuário administrador:
 
@@ -144,7 +144,7 @@ O sistema utiliza ASP.NET Core Identity para autenticação. Para criar um usuá
 3. Crie uma conta
 4. Use o sistema normalmente
 
-## 📱 Funcionalidades Principais
+##  Funcionalidades Principais
 
 ### Para Administradores
 - **Gestão de Lojas**: Cadastre e gerencie suas lojas
@@ -159,7 +159,7 @@ O sistema utiliza ASP.NET Core Identity para autenticação. Para criar um usuá
 - **Escolha de Prestadores**: Veja profissionais disponíveis
 - **Agendamento Independente**: Faça seu agendamento sem intermediação
 
-## 🚀 Deploy
+##  Deploy
 
 ### Deploy Local
 ```bash
@@ -172,14 +172,14 @@ dotnet publish -c Release -o ./publish
 3. Configure SSL/HTTPS
 4. Configure backup do banco de dados
 
-## 🧪 Testes
+##  Testes
 
 ```bash
 # Execute os testes unitários
 dotnet test
 ```
 
-## 📝 API Endpoints
+##  API Endpoints
 
 ### Agendamento Público
 - `GET /agendamento/{lojaSlug}` - Página de agendamento público
@@ -193,7 +193,7 @@ dotnet test
 - `POST /agendamento/confirmar/{id}` - Confirmar agendamento
 - `POST /agendamento/cancelar/{id}` - Cancelar agendamento
 
-## 🤝 Contribuindo
+##  Contribuindo
 
 1. Faça um fork do projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
@@ -201,17 +201,17 @@ dotnet test
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📄 Licença
+##  Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## 📞 Suporte
+##  Suporte
 
 - **Email**: contato@agendaapp.com
 - **Telefone**: (11) 99999-9999
 - **Documentação**: [Wiki do Projeto](https://github.com/seu-usuario/agendaapp/wiki)
 
-## 🗺️ Roadmap
+## 🗺 Roadmap
 
 - [ ] Sistema de notificações por email/SMS
 - [ ] Integração com Google Calendar
@@ -220,12 +220,6 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 - [ ] Relatórios avançados
 - [ ] API pública para integrações
 
-## 🙏 Agradecimentos
-
-- ASP.NET Core Team
-- Entity Framework Team
-- Bootstrap Team
-- Comunidade .NET
 
 ---
 
